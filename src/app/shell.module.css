@@ -54,6 +54,14 @@
   background: rgb(244 248 246 / 14%);
 }
 
+.language {
+  background: transparent;
+  color: var(--cream);
+  border: 1px solid rgb(244 248 246 / 28%);
+  border-radius: 999px;
+  padding: 8px 12px;
+}
+
 .account {
   background: transparent;
   border: 1px solid rgb(244 248 246 / 28%);

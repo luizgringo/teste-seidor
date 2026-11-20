@@ -8,12 +8,15 @@ import { loadLocalEnv } from './env.ts'
 
 loadLocalEnv()
 
+/** Valor state. */
 const state = buildState(Date.now(), process.env.SEED_VERSION ?? '2026-11-20')
+/** Valor store. */
 const store =
   process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
     ? createRedisStore(state)
     : createMemoryStore(state)
 
+/** Valor websocket. */
 const websocket = new WebSocketServer({ noServer: true })
 
 /** Node server exported for Vercel. Local development listens from server/index.ts. */

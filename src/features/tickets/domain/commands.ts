@@ -10,6 +10,7 @@ export type CommandContext = {
   createId: () => string
 }
 
+/** Tipo CommandResult. */
 export type CommandResult =
   | { ok: true; state: AppState; events: DomainEvent[] }
   | { ok: false; status: 400 | 403 | 404; message: string }
@@ -21,14 +22,19 @@ export function openTicket(
   input: { title: string; description: string },
   context: CommandContext,
 ): CommandResult {
+  /** Valor title. */
   const title = input.title.trim()
+  /** Valor description. */
   const description = input.description.trim()
   if (title.length < 3 || description.length < 3) {
-    return fail(400, 'Title and description need at least 3 characters.')
+    return fail(400, 'errors.titleTooShort')
   }
+  /** Valor groupId. */
   const groupId = actor.groupId ?? defaultGroupId(state)
-  if (!groupId) return fail(400, 'No support group is available.')
+  if (!groupId) return fail(400, 'errors.noGroup')
+  /** Valor priority. */
   const priority: Priority = 'medium'
+  /** Valor ticket. */
   const ticket: Ticket = {
     id: context.createId(),
     number: nextNumber(state),
@@ -43,6 +49,7 @@ export function openTicket(
     dueAt: new Date(Date.parse(context.now) + SLA_MINUTES[priority] * 60_000).toISOString(),
     updatedAt: context.now,
   }
+  /** Valor event. */
   const event: DomainEvent = {
     id: context.createId(),
     type: 'ticket.opened',
@@ -60,18 +67,22 @@ export function addMessage(
   input: { body: string; visibility: 'public' | 'internal' },
   context: CommandContext,
 ): CommandResult {
+  /** Valor ticket. */
   const ticket = state.tickets.find((item) => item.id === ticketId)
-  if (!ticket) return fail(404, 'Ticket not found.')
-  if (!canAccess(actor, ticket)) return fail(403, 'You cannot write on this ticket.')
+  if (!ticket) return fail(404, 'errors.notFound')
+  if (!canAccess(actor, ticket)) return fail(403, 'errors.cannotWrite')
+  /** Valor capabilities. */
   const capabilities = capabilitiesFor(actor, ticket)
   if (input.visibility === 'internal' && !capabilities.canCreateInternalNote) {
-    return fail(403, 'Internal notes stay with the support team.')
+    return fail(403, 'errors.internalForbidden')
   }
   if (input.visibility === 'public' && !capabilities.canReply) {
-    return fail(403, 'This ticket is not open for replies.')
+    return fail(403, 'errors.cannotReply')
   }
+  /** Valor body. */
   const body = input.body.trim()
-  if (body.length < 1) return fail(400, 'Write a message before sending.')
+  if (body.length < 1) return fail(400, 'errors.emptyMessage')
+  /** Valor event. */
   const event: DomainEvent = {
     id: context.createId(),
     type: 'message.added',
@@ -96,14 +107,17 @@ export function changeStatus(
   input: { to: Ticket['status']; reason: string },
   context: CommandContext,
 ): CommandResult {
+  /** Valor ticket. */
   const ticket = state.tickets.find((item) => item.id === ticketId)
-  if (!ticket) return fail(404, 'Ticket not found.')
-  if (!canAccess(actor, ticket)) return fail(403, 'You cannot change this ticket.')
+  if (!ticket) return fail(404, 'errors.notFound')
+  if (!canAccess(actor, ticket)) return fail(403, 'errors.cannotChange')
   if (!canMoveStatus(ticket.status, input.to, actor.role)) {
-    return fail(403, 'That status change is not available.')
+    return fail(403, 'errors.invalidTransition')
   }
+  /** Valor reason. */
   const reason = input.reason.trim()
-  if (reason.length < 3) return fail(400, 'A reason needs at least 3 characters.')
+  if (reason.length < 3) return fail(400, 'errors.reasonTooShort')
+  /** Valor event. */
   const event: DomainEvent = {
     id: context.createId(),
     type: 'status.changed',
@@ -126,9 +140,10 @@ export function takeTicket(
   ticketId: string,
   context: CommandContext,
 ): CommandResult {
+  /** Valor ticket. */
   const ticket = state.tickets.find((item) => item.id === ticketId)
-  if (!ticket) return fail(404, 'Ticket not found.')
-  if (!capabilitiesFor(actor, ticket).canTake) return fail(403, 'You cannot take this ticket.')
+  if (!ticket) return fail(404, 'errors.notFound')
+  if (!capabilitiesFor(actor, ticket).canTake) return fail(403, 'errors.cannotTake')
   return assignTo(state, actor, ticket, actor.id, 'Ticket taken', context)
 }
 
@@ -140,19 +155,22 @@ export function assignTicket(
   consultantId: string,
   context: CommandContext,
 ): CommandResult {
+  /** Valor ticket. */
   const ticket = state.tickets.find((item) => item.id === ticketId)
-  if (!ticket) return fail(404, 'Ticket not found.')
+  if (!ticket) return fail(404, 'errors.notFound')
   if (!capabilitiesFor(actor, ticket).canReassign) {
-    return fail(403, 'Only a manager can reassign a ticket.')
+    return fail(403, 'errors.cannotReassign')
   }
+  /** Valor consultant. */
   const consultant = state.users.find((user) => user.id === consultantId)
   if (consultant?.role !== 'consultant') {
-    return fail(400, 'Choose a consultant.')
+    return fail(400, 'errors.chooseConsultant')
   }
   if (ticket.assigneeId === consultantId) return ok(state, [])
   return assignTo(state, actor, ticket, consultantId, 'Ticket reassigned', context)
 }
 
+/** Executa assignTo. */
 function assignTo(
   state: AppState,
   actor: User,
@@ -161,15 +179,19 @@ function assignTo(
   reason: string,
   context: CommandContext,
 ): CommandResult {
+  /** Valor assigned. */
   const assigned: DomainEvent = {
     id: context.createId(),
     type: 'ticket.assigned',
     occurredAt: context.now,
     payload: { ticketId: ticket.id, consultantId },
   }
+  /** Valor next. */
   let next = applyEvent(state, assigned)
+  /** Valor events. */
   const events: DomainEvent[] = [assigned]
   if (ticket.status === 'open') {
+    /** Valor changed. */
     const changed: DomainEvent = {
       id: context.createId(),
       type: 'status.changed',
@@ -188,23 +210,30 @@ function assignTo(
   return ok(next, events)
 }
 
+/** Executa nextNumber. */
 function nextNumber(state: AppState): string {
+  /** Valor highest. */
   const highest = state.tickets.reduce((max, ticket) => {
+    /** Valor value. */
     const value = Number(ticket.number.replace('TCK-', ''))
     return Number.isFinite(value) ? Math.max(max, value) : max
   }, 10000)
   return `TCK-${highest + 1}`
 }
 
+/** Executa defaultGroupId. */
 function defaultGroupId(state: AppState): string | null {
+  /** Valor serviceDesk. */
   const serviceDesk = state.groups.find((group) => group.name === 'Service Desk')
   return serviceDesk?.id ?? state.groups[0]?.id ?? null
 }
 
+/** Executa ok. */
 function ok(state: AppState, events: DomainEvent[]): CommandResult {
   return { ok: true, state, events }
 }
 
+/** Executa fail. */
 function fail(status: 400 | 403 | 404, message: string): CommandResult {
   return { ok: false, status, message }
 }

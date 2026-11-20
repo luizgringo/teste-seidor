@@ -31,7 +31,9 @@ export const HELENA_OPEN_TITLE = 'VPN from Lisbon fails'
 /** Closed request that should be suggested when Helena describes the same problem. */
 export const HELENA_CLOSED_TITLE = 'VPN from Lisbon fails when the office network changes'
 
+/** Valor SYSTEMS. */
 const SYSTEMS = ['VPN', 'Email', 'ERP', 'Payroll', 'Printer', 'Badge', 'Laptop', 'SSO', 'Scanner']
+/** Valor PROBLEMS. */
 const PROBLEMS = [
   'times out after login',
   'shows the wrong total',
@@ -45,18 +47,26 @@ const PROBLEMS = [
  * The original dados.json link had expired, so this snapshot is reconstructed from the brief.
  */
 export function buildState(nowMs: number, seedVersion: string): AppState {
+  /** Valor at. */
   const at = (minutesFromNow: number) => new Date(nowMs + minutesFromNow * 60_000).toISOString()
+  /** Valor users. */
   const users = buildUsers()
+  /** Valor groups. */
   const groups: Group[] = [
     { id: GROUP.applications, name: 'Applications' },
     { id: GROUP.infrastructure, name: 'Infrastructure' },
     { id: GROUP.serviceDesk, name: 'Service Desk' },
   ]
+  /** Valor tickets. */
   const tickets: Ticket[] = []
+  /** Valor messages. */
   const messages: Message[] = []
+  /** Valor assignments. */
   const assignments: Assignment[] = []
+  /** Valor statusChanges. */
   const statusChanges: AppState['statusChanges'] = []
 
+  /** Valor push. */
   const push = (ticket: Ticket, note?: string) => {
     tickets.push(ticket)
     if (ticket.assigneeId) {
@@ -168,26 +178,36 @@ export function buildState(nowMs: number, seedVersion: string): AppState {
       updatedAt: at(-17_000),
     }),
   )
+  /** Valor closedAssignment. */
   const closedAssignment = assignments.find((item) => item.ticketId.endsWith('013'))
   if (closedAssignment) closedAssignment.endedAt = at(-17_000)
 
+  /** Valor consultants. */
   const consultants = users.filter(
     (user) => user.role === 'consultant' && user.id !== PERSONA.paulo,
   )
   for (let index = 0; index < 110; index += 1) {
+    /** Valor marinaSlot. */
     const marinaSlot = index < 38
+    /** Valor unassigned. */
     const unassigned = index >= 38 && index < 50
+    /** Valor consultant. */
     const consultant = consultants[index % consultants.length]
+    /** Valor assigneeId. */
     const assigneeId = marinaSlot ? PERSONA.marina : unassigned ? null : (consultant?.id ?? null)
+    /** Valor groupId. */
     const groupId =
       marinaSlot || unassigned ? GROUP.applications : (consultant?.groupId ?? GROUP.serviceDesk)
+    /** Valor dueAt. */
     const dueAt =
       marinaSlot && index < 3
         ? at(-40 + index * 10)
         : marinaSlot && index < 8
           ? at(15 + index * 8)
           : at(240 + (index % 12) * 90)
+    /** Valor status. */
     const status = statusFor(index, assigneeId)
+    /** Valor requester. */
     const requester = users.filter((user) => user.role === 'customer')[index % 6]
     push(
       ticket({
@@ -235,7 +255,9 @@ export function buildState(nowMs: number, seedVersion: string): AppState {
   }
 }
 
+/** Executa buildUsers. */
 function buildUsers(): User[] {
+  /** Valor consultant. */
   const consultant = (id: string, name: string, groupId: string): User => ({
     id,
     name,
@@ -244,6 +266,7 @@ function buildUsers(): User[] {
     groupId,
     timeZone: 'America/Sao_Paulo',
   })
+  /** Valor customer. */
   const customer = (id: string, name: string, timeZone: string): User => ({
     id,
     name,
@@ -282,10 +305,12 @@ function buildUsers(): User[] {
   ]
 }
 
+/** Executa ticket. */
 function ticket(value: Ticket): Ticket {
   return value
 }
 
+/** Executa statusFor. */
 function statusFor(index: number, assigneeId: string | null): TicketStatus {
   if (index % 17 === 0) return 'closed'
   if (index % 13 === 0) return 'resolved'
@@ -293,6 +318,7 @@ function statusFor(index: number, assigneeId: string | null): TicketStatus {
   return assigneeId ? 'in_progress' : 'open'
 }
 
+/** Executa priorityFor. */
 function priorityFor(index: number): Priority {
   if (index % 11 === 0) return 'critical'
   if (index % 3 === 0) return 'high'

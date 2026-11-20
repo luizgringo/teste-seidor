@@ -25,6 +25,7 @@ import { clearSessionCookie, readSession, type Session, sessionCookie } from './
 import type { TicketStore } from './data/memoryStore.ts'
 import { sessionSecret } from './env.ts'
 
+/** Tipo LiveClient. */
 type LiveClient = {
   socket: WSContext
   personaId: string | null
@@ -32,19 +33,27 @@ type LiveClient = {
 
 /** HTTP and WebSocket application bound to a ticket store. */
 export function createApp(store: TicketStore) {
+  /** Valor app. */
   const app = new Hono()
+  /** Valor clients. */
   const clients = new Set<LiveClient>()
+  /** Valor sent. */
   const sent = new Set<string>()
+  /** Valor last. */
   let last: { event: DomainEvent; state: AppState } | null = null
+  /** Valor secret. */
   const secret = sessionSecret()
 
+  /** Valor deliver. */
   const deliver = (event: DomainEvent, state: AppState, force: boolean) => {
     if (!force && sent.has(event.id)) return
     sent.add(event.id)
     for (const client of clients) {
       if (!client.personaId || client.socket.readyState !== 1) continue
+      /** Valor viewer. */
       const viewer = state.users.find((user) => user.id === client.personaId)
       if (!viewer) continue
+      /** Valor visible. */
       const visible = presentEvent(event, state, viewer)
       if (!visible) continue
       client.socket.send(JSON.stringify(visible))
@@ -66,8 +75,10 @@ export function createApp(store: TicketStore) {
   )
 
   app.get('/api/session', async (c) => {
+    /** Valor session. */
     const session = readSession(c.req.header('cookie'), secret)
-    if (!session) return c.json({ message: 'Sign in required.' }, 401)
+    if (!session) return c.json({ message: 'errors.signIn' }, 401)
+    /** Valor state. */
     const state = await store.read()
     return c.json({
       githubLogin: session.githubLogin,
@@ -77,13 +88,17 @@ export function createApp(store: TicketStore) {
   })
 
   app.post('/api/session/persona', async (c) => {
+    /** Valor session. */
     const session = readSession(c.req.header('cookie'), secret)
-    if (!session) return c.json({ message: 'Sign in required.' }, 401)
+    if (!session) return c.json({ message: 'errors.signIn' }, 401)
+    /** Valor body. */
     const body = parsed(personaSchema, await c.req.json().catch(() => null))
     if (!body.ok) return c.json({ message: body.message }, 400)
+    /** Valor state. */
     const state = await store.read()
+    /** Valor persona. */
     const persona = state.users.find((user) => user.id === body.data.personaId)
-    if (!persona) return c.json({ message: 'Unknown persona.' }, 404)
+    if (!persona) return c.json({ message: 'errors.unknownPersona' }, 404)
     c.header('Set-Cookie', sessionCookie({ ...session, personaId: persona.id }, secret))
     return c.json({ persona })
   })
@@ -94,13 +109,17 @@ export function createApp(store: TicketStore) {
   })
 
   app.post('/auth/test-session', async (c) => {
-    if (process.env.E2E_SESSION !== '1') return c.json({ message: 'Not found.' }, 404)
+    if (process.env.E2E_SESSION !== '1') return c.json({ message: 'errors.notFound' }, 404)
+    /** Valor body. */
     const body = (await c.req.json().catch(() => ({}))) as { personaId?: string }
+    /** Valor state. */
     const state = await store.read()
+    /** Valor personaId. */
     const personaId = body.personaId ?? null
     if (personaId && !state.users.some((user) => user.id === personaId)) {
-      return c.json({ message: 'Unknown persona.' }, 404)
+      return c.json({ message: 'errors.unknownPersona' }, 404)
     }
+    /** Valor session. */
     const session: Session = {
       githubLogin: 'local-preview',
       githubName: 'Local preview',
@@ -111,20 +130,26 @@ export function createApp(store: TicketStore) {
   })
 
   app.get('/auth/github', (c) => {
+    /** Valor state. */
     const state = randomBytes(16).toString('hex')
+    /** Valor url. */
     const url = githubAuthorizeUrl(state)
-    if (!url) return c.json({ message: 'GitHub login is not configured.' }, 400)
+    if (!url) return c.json({ message: 'errors.githubMissing' }, 400)
     c.header('Set-Cookie', `itsm_oauth=${state}; HttpOnly; Path=/; Max-Age=600; SameSite=Lax`)
     return c.redirect(url)
   })
 
   app.get('/auth/github/callback', async (c) => {
+    /** Valor code. */
     const code = c.req.query('code')
+    /** Valor state. */
     const state = c.req.query('state')
+    /** Valor expected. */
     const expected = cookieValue(c.req.header('cookie'), 'itsm_oauth')
     if (!code || !state || !expected || state !== expected) {
       return c.redirect('/login?error=github')
     }
+    /** Valor identity. */
     const identity = await githubIdentity(code)
     if (!identity) return c.redirect('/login?error=github')
     c.header(
@@ -138,26 +163,31 @@ export function createApp(store: TicketStore) {
   })
 
   app.get('/api/workspace', async (c) => {
+    /** Valor actor. */
     const actor = await requireActor(c, store, secret)
     if (actor instanceof Response) return actor
+    /** Valor workspace. */
     const workspace = presentWorkspace(await store.read(), actor.id)
-    if (!workspace) return c.json({ message: 'Unknown persona.' }, 404)
+    if (!workspace) return c.json({ message: 'errors.unknownPersona' }, 404)
     return c.json(workspace)
   })
 
   app.get('/api/team', async (c) => {
+    /** Valor actor. */
     const actor = await requireActor(c, store, secret)
     if (actor instanceof Response) return actor
-    if (actor.role !== 'manager')
-      return c.json({ message: 'Only a manager can view the team.' }, 403)
+    if (actor.role !== 'manager') return c.json({ message: 'errors.teamForbidden' }, 403)
     return c.json({ consultants: teamLoad(await store.read(), Date.now()) })
   })
 
   app.post('/api/tickets', async (c) => {
+    /** Valor actor. */
     const actor = await requireActor(c, store, secret)
     if (actor instanceof Response) return actor
+    /** Valor body. */
     const body = parsed(openTicketSchema, await c.req.json().catch(() => null))
     if (!body.ok) return c.json({ message: body.message }, 400)
+    /** Valor failure. */
     const failure = await commitCommand(store, (state) =>
       openTicket(state, actor, body.data, commandContext()),
     )
@@ -166,11 +196,15 @@ export function createApp(store: TicketStore) {
   })
 
   app.post('/api/tickets/:ticketId/messages', async (c) => {
+    /** Valor actor. */
     const actor = await requireActor(c, store, secret)
     if (actor instanceof Response) return actor
+    /** Valor body. */
     const body = parsed(messageSchema, await c.req.json().catch(() => null))
     if (!body.ok) return c.json({ message: body.message }, 400)
+    /** Valor ticketId. */
     const ticketId = c.req.param('ticketId')
+    /** Valor failure. */
     const failure = await commitCommand(store, (state) =>
       addMessage(state, actor, ticketId, body.data, commandContext()),
     )
@@ -179,11 +213,15 @@ export function createApp(store: TicketStore) {
   })
 
   app.post('/api/tickets/:ticketId/status', async (c) => {
+    /** Valor actor. */
     const actor = await requireActor(c, store, secret)
     if (actor instanceof Response) return actor
+    /** Valor body. */
     const body = parsed(statusSchema, await c.req.json().catch(() => null))
     if (!body.ok) return c.json({ message: body.message }, 400)
+    /** Valor ticketId. */
     const ticketId = c.req.param('ticketId')
+    /** Valor failure. */
     const failure = await commitCommand(store, (state) =>
       changeStatus(state, actor, ticketId, body.data, commandContext()),
     )
@@ -192,9 +230,12 @@ export function createApp(store: TicketStore) {
   })
 
   app.post('/api/tickets/:ticketId/take', async (c) => {
+    /** Valor actor. */
     const actor = await requireActor(c, store, secret)
     if (actor instanceof Response) return actor
+    /** Valor ticketId. */
     const ticketId = c.req.param('ticketId')
+    /** Valor failure. */
     const failure = await commitCommand(store, (state) =>
       takeTicket(state, actor, ticketId, commandContext()),
     )
@@ -203,11 +244,15 @@ export function createApp(store: TicketStore) {
   })
 
   app.post('/api/tickets/:ticketId/assign', async (c) => {
+    /** Valor actor. */
     const actor = await requireActor(c, store, secret)
     if (actor instanceof Response) return actor
+    /** Valor body. */
     const body = parsed(assignSchema, await c.req.json().catch(() => null))
     if (!body.ok) return c.json({ message: body.message }, 400)
+    /** Valor ticketId. */
     const ticketId = c.req.param('ticketId')
+    /** Valor failure. */
     const failure = await commitCommand(store, (state) =>
       assignTicket(state, actor, ticketId, body.data.consultantId, commandContext()),
     )
@@ -216,14 +261,17 @@ export function createApp(store: TicketStore) {
   })
 
   app.post('/api/test/replay', (c) => {
-    if (process.env.E2E_SESSION !== '1') return c.json({ message: 'Not found.' }, 404)
-    if (!last) return c.json({ message: 'No event yet.' }, 400)
+    if (process.env.E2E_SESSION !== '1') return c.json({ message: 'errors.notFound' }, 404)
+    if (!last) return c.json({ message: 'errors.noEvent' }, 400)
     deliver(last.event, last.state, true)
     return c.json({ ok: true })
   })
 
+  /** Valor socketEvents. */
   const socketEvents = (c: { req: { header: (name: string) => string | undefined } }) => {
+    /** Valor session. */
     const session = readSession(c.req.header('cookie'), secret)
+    /** Valor current. */
     let current: LiveClient | null = null
     return {
       onOpen(_event: unknown, socket: WSContext) {
@@ -243,34 +291,42 @@ export function createApp(store: TicketStore) {
 
 /** Starts the HTTP server and the WebSocket upgrade on one port. */
 export function listen(app: Hono, port: number) {
+  /** Valor websocket. */
   const websocket = new WebSocketServer({ noServer: true })
   return serve({ fetch: app.fetch, port, websocket: { server: websocket } })
 }
 
+/** Executa requireActor. */
 async function requireActor(
   c: { req: { header: (name: string) => string | undefined } },
   store: TicketStore,
   secret: string,
 ) {
+  /** Valor session. */
   const session = readSession(c.req.header('cookie'), secret)
-  if (!session) return Response.json({ message: 'Sign in required.' }, { status: 401 })
-  if (!session.personaId) return Response.json({ message: 'Choose a persona.' }, { status: 401 })
+  if (!session) return Response.json({ message: 'errors.signIn' }, { status: 401 })
+  if (!session.personaId) return Response.json({ message: 'errors.choosePersona' }, { status: 401 })
+  /** Valor user. */
   const user = personaUser(await store.read(), session)
-  if (!user) return Response.json({ message: 'Unknown persona.' }, { status: 404 })
+  if (!user) return Response.json({ message: 'errors.unknownPersona' }, { status: 404 })
   return user
 }
 
+/** Executa personaUser. */
 function personaUser(state: AppState, session: Session): User | null {
   if (!session.personaId) return null
   return state.users.find((user) => user.id === session.personaId) ?? null
 }
 
+/** Executa commitCommand. */
 async function commitCommand(
   store: TicketStore,
   run: (state: AppState) => ReturnType<typeof openTicket>,
 ): Promise<{ status: 400 | 403 | 404; message: string } | null> {
+  /** Valor failure. */
   let failure: { status: 400 | 403 | 404; message: string } | null = null
   await store.commit((state) => {
+    /** Valor result. */
     const result = run(state)
     if (!result.ok) {
       failure = { status: result.status, message: result.message }
@@ -281,10 +337,12 @@ async function commitCommand(
   return failure
 }
 
+/** Executa commandContext. */
 function commandContext() {
   return { now: new Date().toISOString(), createId: () => crypto.randomUUID() }
 }
 
+/** Executa parsed. */
 function parsed<T>(
   schema: {
     safeParse: (
@@ -293,15 +351,17 @@ function parsed<T>(
   },
   value: unknown,
 ) {
+  /** Valor result. */
   const result = schema.safeParse(value)
-  if (!result.success)
-    return { ok: false as const, message: result.error.issues[0]?.message ?? 'Invalid request.' }
+  if (!result.success) return { ok: false as const, message: 'errors.invalid' }
   return { ok: true as const, data: result.data }
 }
 
+/** Executa cookieValue. */
 function cookieValue(header: string | undefined, name: string): string | null {
   if (!header) return null
   for (const part of header.split(';')) {
+    /** Valor valor. */
     const [key, ...rest] = part.trim().split('=')
     if (key === name) return rest.join('=')
   }

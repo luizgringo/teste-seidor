@@ -53,7 +53,7 @@ pnpm dev
 
 O Vite encaminha `/api`, `/auth` e `/ws` para a API. O navegador fala só com a porta 5173, e o cookie de sessão fica no mesmo endereço.
 
-Abra http://localhost:5173/login. Neste ambiente local o GitHub ainda não está configurado. Use **Preview the desk** e escolha a persona:
+Abra http://localhost:5173/login. A interface abre em português do Brasil. O seletor **Idioma**, no topo, troca para inglês ou espanhol. Neste ambiente local o GitHub ainda não está configurado. Use **Ver a mesa** e escolha a persona:
 
 | Persona         | O que a tela mostra                                                 |
 | --------------- | ------------------------------------------------------------------- |

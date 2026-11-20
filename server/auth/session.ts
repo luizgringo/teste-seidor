@@ -1,5 +1,6 @@
 import { createHmac, timingSafeEqual } from 'node:crypto'
 
+/** Valor COOKIE. */
 const COOKIE = 'itsm_session'
 
 /** Who authenticated, and which persona they are viewing as. */
@@ -11,24 +12,34 @@ export type Session = {
 
 /** Serializes a session into a signed cookie value. */
 export function encodeSession(session: Session, secret: string): string {
+  /** Valor payload. */
   const payload = Buffer.from(JSON.stringify(session)).toString('base64url')
+  /** Valor mac. */
   const mac = createHmac('sha256', secret).update(payload).digest('base64url')
   return `${payload}.${mac}`
 }
 
 /** Reads the session cookie. Returns null when the signature does not match. */
 export function readSession(cookieHeader: string | undefined, secret: string): Session | null {
+  /** Valor raw. */
   const raw = cookieValue(cookieHeader, COOKIE)
   if (!raw) return null
+  /** Valor dot. */
   const dot = raw.lastIndexOf('.')
   if (dot <= 0) return null
+  /** Valor payload. */
   const payload = raw.slice(0, dot)
+  /** Valor mac. */
   const mac = raw.slice(dot + 1)
+  /** Valor expected. */
   const expected = createHmac('sha256', secret).update(payload).digest('base64url')
+  /** Valor left. */
   const left = Buffer.from(mac)
+  /** Valor right. */
   const right = Buffer.from(expected)
   if (left.length !== right.length || !timingSafeEqual(left, right)) return null
   try {
+    /** Valor parsed. */
     const parsed = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')) as Session
     if (!parsed.githubLogin || !parsed.githubName) return null
     return parsed
@@ -39,19 +50,23 @@ export function readSession(cookieHeader: string | undefined, secret: string): S
 
 /** Set-Cookie header for the session. */
 export function sessionCookie(session: Session, secret: string): string {
+  /** Valor secure. */
   const secure = process.env.VERCEL ? '; Secure' : ''
   return `${COOKIE}=${encodeSession(session, secret)}; HttpOnly; Path=/; SameSite=Lax; Max-Age=43200${secure}`
 }
 
 /** Clears the session cookie. */
 export function clearSessionCookie(): string {
+  /** Valor secure. */
   const secure = process.env.VERCEL ? '; Secure' : ''
   return `${COOKIE}=; HttpOnly; Path=/; SameSite=Lax; Max-Age=0${secure}`
 }
 
+/** Executa cookieValue. */
 function cookieValue(header: string | undefined, name: string): string | null {
   if (!header) return null
   for (const part of header.split(';')) {
+    /** Valor valor. */
     const [key, ...rest] = part.trim().split('=')
     if (key === name) return decodeURIComponent(rest.join('='))
   }

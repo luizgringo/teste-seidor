@@ -16,7 +16,7 @@ describe('presentWorkspace', () => {
     expect(workspace?.tickets[0]?.priority).toBeNull()
     expect(workspace?.tickets[0]?.groupId).toBeNull()
     expect(workspace?.groups).toEqual([])
-    expect(workspace?.tickets[0]?.statusLabel).toBe('Waiting for someone to pick this up')
+    expect(workspace?.tickets[0]?.statusLabel).toBe('Aguardando alguém assumir')
   })
 
   it('keeps the internal note for Marina and the full board for Ricardo', () => {

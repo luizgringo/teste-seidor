@@ -7,6 +7,7 @@ import type { ClientEvent, StatusChange, Workspace } from './types.ts'
  */
 export function reduceWorkspace(workspace: Workspace, event: ClientEvent): Workspace {
   if (workspace.seenEventIds.includes(event.id)) return workspace
+  /** Valor seenEventIds. */
   const seenEventIds = [...workspace.seenEventIds, event.id].slice(-500)
   switch (event.type) {
     case 'ticket.opened':
@@ -39,6 +40,7 @@ export function reduceWorkspace(workspace: Workspace, event: ClientEvent): Works
         ),
       }
     case 'status.changed': {
+      /** Valor change. */
       const change: StatusChange = {
         id: `${event.id}:status`,
         ticketId: event.payload.ticketId,
@@ -65,6 +67,7 @@ export function reduceWorkspace(workspace: Workspace, event: ClientEvent): Works
       }
     }
     default: {
+      /** Valor neverEvent. */
       const neverEvent: never = event
       return neverEvent
     }

@@ -1,5 +1,6 @@
 import type { Role, TicketStatus } from './types.ts'
 
+/** Valor NEXT. */
 const NEXT: Record<TicketStatus, readonly TicketStatus[]> = {
   open: ['in_progress', 'waiting_on_customer', 'closed'],
   in_progress: ['waiting_on_customer', 'resolved', 'closed'],

@@ -3,17 +3,22 @@ import { dueState } from './sla.ts'
 import { isDone } from './status.ts'
 import type { AppState, ConsultantLoad } from './types.ts'
 
+/** Valor WEEK_MS. */
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000
 
 /** One row per consultant, busiest and most at risk first. */
 export function teamLoad(state: AppState, nowMs: number): ConsultantLoad[] {
+  /** Valor windowStart. */
   const windowStart = nowMs - WEEK_MS
+  /** Valor rows. */
   const rows = state.users
     .filter((user) => user.role === 'consultant')
     .map((consultant) => {
+      /** Valor assigned. */
       const assigned = state.tickets.filter(
         (ticket) => ticket.assigneeId === consultant.id && !isDone(ticket.status),
       )
+      /** Valor atRiskCount. */
       const atRiskCount = assigned.filter(
         (ticket) => dueState(ticket.dueAt, nowMs).tone !== 'ok',
       ).length

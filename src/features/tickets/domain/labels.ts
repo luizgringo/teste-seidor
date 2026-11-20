@@ -6,16 +6,17 @@ import type { TicketStatus } from './types.ts'
 export function statusLabel(status: TicketStatus): string {
   switch (status) {
     case 'open':
-      return 'Waiting for someone to pick this up'
+      return 'Aguardando alguém assumir'
     case 'in_progress':
-      return 'Someone is on it'
+      return 'Alguém está cuidando'
     case 'waiting_on_customer':
-      return 'We need you'
+      return 'Precisamos de você'
     case 'resolved':
-      return 'Resolved'
+      return 'Resolvido'
     case 'closed':
-      return 'Closed'
+      return 'Fechado'
     default: {
+      /** Valor neverStatus. */
       const neverStatus: never = status
       return neverStatus
     }

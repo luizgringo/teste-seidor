@@ -2,6 +2,7 @@ import { compareByDue, dueState } from './sla.ts'
 import { isDone } from './status.ts'
 import type { User, WireTicket } from './types.ts'
 
+/** Tipo QueueSection. */
 export type QueueSection = {
   id: string
   title: string
@@ -18,16 +19,21 @@ export function queueSections(
   nowMs: number,
   showDone: boolean,
 ): QueueSection[] {
+  /** Valor visible. */
   const visible = (showDone ? tickets : tickets.filter((ticket) => !isDone(ticket.status))).slice()
   visible.sort(compareByDue)
   if (viewer.role !== 'consultant') return [{ id: 'queue', title: 'Queue', tickets: visible }]
+  /** Valor atRisk. */
   const atRisk = visible.filter(
     (ticket) => ticket.assigneeId === viewer.id && dueState(ticket.dueAt, nowMs).tone !== 'ok',
   )
+  /** Valor riskIds. */
   const riskIds = new Set(atRisk.map((ticket) => ticket.id))
+  /** Valor unassigned. */
   const unassigned = visible.filter(
     (ticket) => ticket.assigneeId === null && ticket.groupId === viewer.groupId,
   )
+  /** Valor mine. */
   const mine = visible.filter(
     (ticket) => ticket.assigneeId === viewer.id && !riskIds.has(ticket.id),
   )

@@ -14,6 +14,7 @@ import type {
 /** Ticket projection for the viewer. Null when the ticket is outside their scope. */
 export function presentTicket(ticket: Ticket, viewer: User): WireTicket | null {
   if (!canAccess(viewer, ticket)) return null
+  /** Valor staff. */
   const staff = viewer.role !== 'customer'
   return {
     id: ticket.id,
@@ -47,22 +48,26 @@ export function presentEvent(
 ): ClientEvent | null {
   switch (event.type) {
     case 'ticket.opened': {
+      /** Valor visible. */
       const visible = presentTicket(event.payload, viewer)
       if (!visible) return null
       return { ...event, payload: visible }
     }
     case 'message.added': {
+      /** Valor ticket. */
       const ticket = state.tickets.find((item) => item.id === event.payload.ticketId)
       if (!ticket || !presentMessage(event.payload, ticket, viewer)) return null
       return event
     }
     case 'ticket.assigned':
     case 'status.changed': {
+      /** Valor ticket. */
       const ticket = state.tickets.find((item) => item.id === event.payload.ticketId)
       if (!ticket || !canAccess(viewer, ticket)) return null
       return event
     }
     default: {
+      /** Valor neverEvent. */
       const neverEvent: never = event
       return neverEvent
     }
@@ -71,17 +76,24 @@ export function presentEvent(
 
 /** Screen snapshot for one persona. Hidden fields are removed, not just styled away. */
 export function presentWorkspace(state: AppState, viewerId: string): Workspace | null {
+  /** Valor viewer. */
   const viewer = state.users.find((user) => user.id === viewerId)
   if (!viewer) return null
+  /** Valor tickets. */
   const tickets = state.tickets.flatMap((ticket) => {
+    /** Valor visible. */
     const visible = presentTicket(ticket, viewer)
     return visible ? [visible] : []
   })
+  /** Valor visibleIds. */
   const visibleIds = new Set(tickets.map((ticket) => ticket.id))
+  /** Valor messages. */
   const messages = state.messages.filter((message) => {
+    /** Valor ticket. */
     const ticket = state.tickets.find((item) => item.id === message.ticketId)
     return ticket ? presentMessage(message, ticket, viewer) !== null : false
   })
+  /** Valor statusChanges. */
   const statusChanges = state.statusChanges.filter((change) => visibleIds.has(change.ticketId))
   return {
     viewer,
@@ -94,6 +106,7 @@ export function presentWorkspace(state: AppState, viewerId: string): Workspace |
   }
 }
 
+/** Executa presentUsers. */
 function presentUsers(
   state: AppState,
   viewer: User,
@@ -110,6 +123,7 @@ function presentUsers(
         user.groupId === viewer.groupId,
     )
   }
+  /** Valor needed. */
   const needed = new Set<string>([viewer.id])
   for (const ticket of tickets) {
     needed.add(ticket.requesterId)

@@ -13,7 +13,7 @@ function wire(partial: Partial<WireTicket>): WireTicket {
     title: 'VPN',
     description: 'Down',
     status: 'open',
-    statusLabel: 'Waiting for someone to pick this up',
+    statusLabel: 'Aguardando alguém assumir',
     requesterId: helena.id,
     assigneeId: marina.id,
     openedAt: '2026-11-20T08:00:00.000Z',
@@ -27,11 +27,11 @@ function wire(partial: Partial<WireTicket>): WireTicket {
 
 describe('statusLabel', () => {
   it('names every status in plain language', () => {
-    expect(statusLabel('open')).toMatch(/Waiting/)
-    expect(statusLabel('in_progress')).toMatch(/Someone/)
-    expect(statusLabel('waiting_on_customer')).toMatch(/need you/)
-    expect(statusLabel('resolved')).toBe('Resolved')
-    expect(statusLabel('closed')).toBe('Closed')
+    expect(statusLabel('open')).toMatch(/Aguardando/)
+    expect(statusLabel('in_progress')).toMatch(/Alguém/)
+    expect(statusLabel('waiting_on_customer')).toMatch(/Precisamos/)
+    expect(statusLabel('resolved')).toBe('Resolvido')
+    expect(statusLabel('closed')).toBe('Fechado')
   })
 })
 

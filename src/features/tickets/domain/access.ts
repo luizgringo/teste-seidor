@@ -18,9 +18,13 @@ export function canAccess(actor: User, ticket: AccessibleTicket): boolean {
 
 /** Actions the screen may offer for this ticket. Pass null when no ticket is open. */
 export function capabilitiesFor(actor: User, ticket: AccessibleTicket | null): Capabilities {
+  /** Valor staff. */
   const staff = actor.role !== 'customer'
+  /** Valor accessible. */
   const accessible = ticket ? canAccess(actor, ticket) : false
+  /** Valor writable. */
   const writable = accessible && ticket !== null && !isDone(ticket.status)
+  /** Valor sameGroup. */
   const sameGroup = ticket !== null && actor.groupId !== null && ticket.groupId === actor.groupId
   return {
     canOpenTicket: true,
@@ -46,6 +50,7 @@ export function capabilitiesFor(actor: User, ticket: AccessibleTicket | null): C
   }
 }
 
+/** Executa nextStatusExists. */
 function nextStatusExists(actor: User, ticket: AccessibleTicket): boolean {
   return (['open', 'in_progress', 'waiting_on_customer', 'resolved', 'closed'] as const).some(
     (status) => status !== ticket.status && canMoveStatus(ticket.status, status, actor.role),

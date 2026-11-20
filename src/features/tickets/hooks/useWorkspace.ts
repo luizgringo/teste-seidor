@@ -14,18 +14,26 @@ export function useWorkspace() {
 
 /** Applies socket events onto the workspace without touching an open draft. */
 export function useTicketStream(enabled: boolean) {
+  /** Valor client. */
   const client = useQueryClient()
   useEffect(() => {
     if (!enabled) return
+    /** Valor closed. */
     let closed = false
+    /** Valor socket. */
     let socket: WebSocket | null = null
+    /** Valor timer. */
     let timer = 0
+    /** Valor seen. */
     const seen = new Set<string>()
 
+    /** Valor connect. */
     const connect = () => {
+      /** Valor protocol. */
       const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws'
       socket = new WebSocket(`${protocol}://${window.location.host}/api/ws`)
       socket.onmessage = (message) => {
+        /** Valor event. */
         const event = parseEvent(message.data)
         if (!event || seen.has(event.id)) return
         seen.add(event.id)
@@ -48,9 +56,11 @@ export function useTicketStream(enabled: boolean) {
   }, [client, enabled])
 }
 
+/** Executa parseEvent. */
 function parseEvent(raw: unknown): ClientEvent | null {
   if (typeof raw !== 'string') return null
   try {
+    /** Valor value. */
     const value = JSON.parse(raw) as ClientEvent
     if (!value || typeof value.id !== 'string') return null
     if (

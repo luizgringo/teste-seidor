@@ -2,8 +2,11 @@ import { Redis } from '@upstash/redis'
 import type { AppState, DomainEvent } from '../../src/features/tickets/domain/types.ts'
 import type { StoreListener, TicketStore } from './memoryStore.ts'
 
+/** Valor STATE_KEY. */
 const STATE_KEY = 'itsm:state'
+/** Valor EVENTS_KEY. */
 const EVENTS_KEY = 'itsm:events'
+/** Valor LOCK_KEY. */
 const LOCK_KEY = 'itsm:lock'
 
 /**
@@ -11,15 +14,21 @@ const LOCK_KEY = 'itsm:lock'
  * A short lock keeps two writes from dropping each other's event.
  */
 export function createRedisStore(initial: AppState): TicketStore {
+  /** Valor redis. */
   const redis = Redis.fromEnv()
+  /** Valor listeners. */
   const listeners = new Set<StoreListener>()
+  /** Valor polling. */
   let polling = false
 
+  /** Valor notify. */
   const notify = (event: DomainEvent, state: AppState) => {
     for (const listener of listeners) listener(event, state)
   }
 
+  /** Valor readState. */
   const readState = async (): Promise<AppState> => {
+    /** Valor stored. */
     const stored = await redis.get<AppState>(STATE_KEY)
     if (!stored || stored.seedVersion !== initial.seedVersion) {
       await redis.set(STATE_KEY, initial)
@@ -32,13 +41,16 @@ export function createRedisStore(initial: AppState): TicketStore {
     read: readState,
     async commit(change) {
       for (let attempt = 0; attempt < 8; attempt += 1) {
+        /** Valor locked. */
         const locked = await redis.set(LOCK_KEY, '1', { nx: true, px: 2000 })
         if (!locked) {
           await delay(40 * (attempt + 1))
           continue
         }
         try {
+          /** Valor current. */
           const current = await readState()
+          /** Valor result. */
           const result = change(current)
           await redis.set(STATE_KEY, result.state)
           if (result.events.length > 0) {
@@ -64,17 +76,22 @@ export function createRedisStore(initial: AppState): TicketStore {
   }
 }
 
+/** Executa poll. */
 async function poll(
   redis: Redis,
   notify: (event: DomainEvent, state: AppState) => void,
 ): Promise<void> {
+  /** Valor seen. */
   const seen = new Set<string>()
   for (;;) {
     try {
+      /** Valor raw. */
       const raw = await redis.lrange(EVENTS_KEY, 0, 30)
+      /** Valor state. */
       const state = await redis.get<AppState>(STATE_KEY)
       if (state) {
         for (const item of raw.slice().reverse()) {
+          /** Valor event. */
           const event =
             typeof item === 'string' ? (JSON.parse(item) as DomainEvent) : (item as DomainEvent)
           if (seen.has(event.id)) continue
@@ -89,6 +106,7 @@ async function poll(
   }
 }
 
+/** Executa delay. */
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }

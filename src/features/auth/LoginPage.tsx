@@ -1,18 +1,32 @@
 import { useQueryClient } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 import { Navigate, useNavigate } from 'react-router'
 import { useDeskConfig, useSession } from '@/features/auth/useSession.ts'
 import { api } from '@/shared/api/http.ts'
+import { LanguageSelect } from '@/shared/i18n/LanguageSelect.tsx'
 import styles from './auth.module.css'
 
-/** GitHub entry, plus a local preview when the test session is enabled. */
+/**
+ * Entrada pelo GitHub, com prévia local quando o ambiente de teste está ligado.
+ * @returns Tela de login ou redirecionamento se a sessão já existe.
+ */
 export function LoginPage() {
+  /** Valor valor. */
+  const { t } = useTranslation()
+  /** Valor session. */
   const session = useSession()
+  /** Valor config. */
   const config = useDeskConfig()
+  /** Valor client. */
   const client = useQueryClient()
+  /** Valor navigate. */
   const navigate = useNavigate()
   if (session.data?.persona) return <Navigate to={homeFor(session.data.persona.role)} replace />
   if (session.data) return <Navigate to="/session" replace />
 
+  /**
+   * Abre a escolha de persona sem passar pelo GitHub.
+   */
   async function preview() {
     await api('/auth/test-session', { method: 'POST', body: '{}' })
     await client.invalidateQueries({ queryKey: ['session'] })
@@ -22,19 +36,20 @@ export function LoginPage() {
   return (
     <div className={styles.screen}>
       <section className={styles.card}>
-        <p>Support desk</p>
+        <LanguageSelect className={styles.language} />
+        <p>{t('brand.eyebrow')}</p>
         <h1 className={styles.wordmark}>Northline</h1>
-        <p>Sign in, then choose who you are looking through.</p>
+        <p>{t('login.intro')}</p>
         {config.data?.githubEnabled ? (
           <a className={styles.primary} href="/auth/github">
-            Continue with GitHub
+            {t('login.github')}
           </a>
         ) : (
-          <p>GitHub login is not configured in this environment.</p>
+          <p>{t('login.githubMissing')}</p>
         )}
         {config.data?.devSession ? (
           <button className={styles.primary} type="button" onClick={() => void preview()}>
-            Preview the desk
+            {t('login.preview')}
           </button>
         ) : null}
       </section>
@@ -42,6 +57,11 @@ export function LoginPage() {
   )
 }
 
+/**
+ * Destino inicial depois do login, conforme o papel.
+ * @param role - Papel da persona.
+ * @returns Rota da equipe ou da fila.
+ */
 function homeFor(role: string): string {
   return role === 'manager' ? '/team' : '/queue'
 }

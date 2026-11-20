@@ -1,30 +1,34 @@
 import { useQuery } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 import type { ConsultantLoad } from '@/features/tickets/domain/types.ts'
 import { ApiError, api } from '@/shared/api/http.ts'
 import styles from './team.module.css'
 
 /** Ricardo's morning view: who is overloaded, who is idle, who is about to breach. */
 export function TeamPage() {
+  /** Valor valor. */
+  const { t } = useTranslation()
+  /** Valor team. */
   const team = useQuery({
     queryKey: ['team'],
     queryFn: () => api<{ consultants: ConsultantLoad[] }>('/api/team'),
   })
-  if (team.isLoading) return <p className={styles.page}>Loading the team…</p>
+  if (team.isLoading) return <p className={styles.page}>{t('team.loading')}</p>
   if (team.error instanceof ApiError && team.error.status === 403) {
-    return <p className={styles.page}>The team board is for managers.</p>
+    return <p className={styles.page}>{t('team.forbidden')}</p>
   }
-  if (!team.data) return <p className={styles.page}>The team could not be loaded.</p>
+  if (!team.data) return <p className={styles.page}>{t('team.error')}</p>
   return (
     <div className={styles.page}>
-      <h1>Team</h1>
-      <p>Open work, tickets due within two hours, and time this week with nothing assigned.</p>
+      <h1>{t('team.title')}</h1>
+      <p>{t('team.intro')}</p>
       <table>
         <thead>
           <tr>
-            <th>Consultant</th>
-            <th>Open</th>
-            <th>At risk</th>
-            <th>Idle this week</th>
+            <th>{t('team.consultant')}</th>
+            <th>{t('team.open')}</th>
+            <th>{t('team.atRisk')}</th>
+            <th>{t('team.idle')}</th>
           </tr>
         </thead>
         <tbody>
@@ -42,7 +46,9 @@ export function TeamPage() {
   )
 }
 
+/** Executa formatIdle. */
 function formatIdle(minutes: number): string {
+  /** Valor hours. */
   const hours = Math.floor(minutes / 60)
   if (hours < 1) return `${minutes}m`
   return `${hours}h`

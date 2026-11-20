@@ -17,5 +17,5 @@ O README da raiz sobe o projeto. Aqui está o que o sistema faz e por onde o có
 - [HTTP](api/http.md)
 - [Eventos](api/events.md)
 - [Mock](data/mock-dataset.md)
-- [Testes](development/testing.md)
+- [Idiomas e TSDoc](development/i18n.md)
 - [Padrão de engenharia](engineering/REACT_ENGINEERING_STANDARDS.md)

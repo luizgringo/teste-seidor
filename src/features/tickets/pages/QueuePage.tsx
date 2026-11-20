@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useParams, useSearchParams } from 'react-router'
 import styles from '@/features/tickets/components/desk.module.css'
 import { TicketList } from '@/features/tickets/components/TicketList.tsx'
@@ -7,33 +8,47 @@ import { useTicketStream, useWorkspace } from '@/features/tickets/hooks/useWorks
 
 /** Consultant and manager queue, with the open ticket beside it. */
 export function QueuePage() {
+  /** Valor valor. */
+  const { t } = useTranslation()
+  /** Valor workspace. */
   const workspace = useWorkspace()
   useTicketStream(Boolean(workspace.data))
+  /** Valor valor. */
   const [params, setParams] = useSearchParams()
+  /** Valor valor. */
   const { ticketId } = useParams()
+  /** Valor now. */
   const now = Date.now()
-  if (workspace.isLoading) return <p className={styles.empty}>Loading the queue…</p>
+  if (workspace.isLoading) return <p className={styles.empty}>{t('queue.loading')}</p>
   if (workspace.isError || !workspace.data) {
-    return <p className={styles.error}>The queue could not be loaded.</p>
+    return <p className={styles.error}>{t('queue.error')}</p>
   }
+  /** Valor data. */
   const data = workspace.data
+  /** Valor query. */
   const query = params.get('q') ?? ''
+  /** Valor showDone. */
   const showDone = params.get('done') === '1'
+  /** Valor filtered. */
   const filtered = data.tickets.filter((ticket) => {
+    /** Valor haystack. */
     const haystack = `${ticket.number} ${ticket.title}`.toLowerCase()
     return haystack.includes(query.toLowerCase())
   })
+  /** Valor sections. */
   const sections = queueSections(filtered, data.viewer, now, showDone)
+  /** Valor selected. */
   const selected = data.tickets.find((ticket) => ticket.id === ticketId)
   return (
     <div className={styles.page}>
       <div className={styles.list}>
         <search className={styles.filters}>
           <input
-            aria-label="Find a ticket"
+            aria-label={t('queue.find')}
             value={query}
-            placeholder="Find a ticket"
+            placeholder={t('queue.find')}
             onChange={(event) => {
+              /** Valor next. */
               const next = new URLSearchParams(params)
               if (event.target.value) next.set('q', event.target.value)
               else next.delete('q')
@@ -45,13 +60,14 @@ export function QueuePage() {
               className={styles.quiet}
               type="button"
               onClick={() => {
+                /** Valor next. */
                 const next = new URLSearchParams(params)
                 if (showDone) next.delete('done')
                 else next.set('done', '1')
                 setParams(next)
               }}
             >
-              {showDone ? 'Hide closed' : 'Show closed'}
+              {showDone ? t('queue.hideClosed') : t('queue.showClosed')}
             </button>
           ) : null}
         </search>
@@ -66,7 +82,7 @@ export function QueuePage() {
       {selected ? (
         <TicketPanel ticket={selected} workspace={data} nowMs={now} />
       ) : (
-        <p className={styles.empty}>Choose a ticket. The ones about to breach are at the top.</p>
+        <p className={styles.empty}>{t('queue.emptySelection')}</p>
       )}
     </div>
   )

@@ -1,13 +1,15 @@
 import * as Dialog from '@radix-ui/react-dialog'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { capabilitiesFor } from '@/features/tickets/domain/access.ts'
-import { dueLabel } from '@/features/tickets/domain/sla.ts'
 import { nextStatuses } from '@/features/tickets/domain/status.ts'
 import type { User, WireTicket, Workspace } from '@/features/tickets/domain/types.ts'
 import { ApiError, api } from '@/shared/api/http.ts'
+import { formatDue, translateError } from '@/shared/i18n/format.ts'
 import styles from './desk.module.css'
 
+/** Tipo TicketPanelProps. */
 type TicketPanelProps = {
   ticket: WireTicket
   workspace: Workspace
@@ -16,22 +18,29 @@ type TicketPanelProps = {
 
 /** Conversation, reply box, and the facts beside it. The draft lives in the composer. */
 export function TicketPanel({ ticket, workspace, nowMs }: TicketPanelProps) {
+  /** Valor valor. */
+  const { t } = useTranslation()
+  /** Valor capabilities. */
   const capabilities = capabilitiesFor(workspace.viewer, ticket)
+  /** Valor messages. */
   const messages = workspace.messages.filter((message) => message.ticketId === ticket.id)
+  /** Valor changes. */
   const changes = workspace.statusChanges.filter((change) => change.ticketId === ticket.id)
+  /** Valor timeline. */
   const timeline = [
     ...messages.map((message) => ({ kind: 'message' as const, at: message.createdAt, message })),
     ...changes.map((change) => ({ kind: 'status' as const, at: change.occurredAt, change })),
   ].sort((left, right) => left.at.localeCompare(right.at))
+  /** Valor name. */
   const name = (id: string | null) =>
-    workspace.users.find((user) => user.id === id)?.name ?? 'Unassigned'
+    workspace.users.find((user) => user.id === id)?.name ?? t('common.unassigned')
   return (
     <div className={styles.detail}>
-      <section className={styles.conversation} aria-label="Conversation">
+      <section className={styles.conversation} aria-label={t('ticket.conversation')}>
         <header>
           <p className={styles.number}>{ticket.number}</p>
           <h1>{ticket.title}</h1>
-          <p>{ticket.statusLabel}</p>
+          <p>{t(`status.${ticket.status}`)}</p>
         </header>
         <div className={styles.thread}>
           <article className={styles.bubble}>
@@ -46,13 +55,16 @@ export function TicketPanel({ ticket, workspace, nowMs }: TicketPanelProps) {
               >
                 <strong>
                   {name(entry.message.authorId)}
-                  {entry.message.visibility === 'internal' ? ' · Internal note' : ''}
+                  {entry.message.visibility === 'internal' ? ` · ${t('ticket.internalNote')}` : ''}
                 </strong>
                 <p>{entry.message.body}</p>
               </article>
             ) : (
               <p key={entry.change.id}>
-                Status changed to {entry.change.to}. {entry.change.reason}
+                {t('ticket.statusChanged', {
+                  status: t(`status.${entry.change.to}`),
+                  reason: entry.change.reason,
+                })}
               </p>
             ),
           )}
@@ -60,21 +72,23 @@ export function TicketPanel({ ticket, workspace, nowMs }: TicketPanelProps) {
         {capabilities.canReply || capabilities.canCreateInternalNote ? (
           <Composer ticketId={ticket.id} allowInternal={capabilities.canCreateInternalNote} />
         ) : (
-          <p className={styles.empty}>This ticket is closed. Reopen it before writing again.</p>
+          <p className={styles.empty}>{t('ticket.closedHint')}</p>
         )}
       </section>
-      <aside className={styles.context} aria-label="Ticket details">
+      <aside className={styles.context} aria-label={t('ticket.details')}>
         <dl>
-          <dt>Due</dt>
+          <dt>{t('ticket.due')}</dt>
           <dd>
-            {capabilities.canViewTaxonomy ? dueLabel(ticket.dueAt, nowMs) : ticket.statusLabel}
+            {capabilities.canViewTaxonomy
+              ? formatDue(ticket.dueAt, nowMs, t)
+              : t(`status.${ticket.status}`)}
           </dd>
-          <dt>Assignee</dt>
+          <dt>{t('ticket.assignee')}</dt>
           <dd>{name(ticket.assigneeId)}</dd>
           {capabilities.canViewTaxonomy && ticket.priority ? (
             <>
-              <dt>Priority</dt>
-              <dd>{ticket.priority}</dd>
+              <dt>{t('ticket.priority')}</dt>
+              <dd>{t(`priority.${ticket.priority}`)}</dd>
             </>
           ) : null}
         </dl>
@@ -93,11 +107,19 @@ export function TicketPanel({ ticket, workspace, nowMs }: TicketPanelProps) {
   )
 }
 
+/** Executa Composer. */
 function Composer({ ticketId, allowInternal }: { ticketId: string; allowInternal: boolean }) {
+  /** Valor valor. */
+  const { t } = useTranslation()
+  /** Valor client. */
   const client = useQueryClient()
+  /** Valor valor. */
   const [body, setBody] = useState('')
+  /** Valor valor. */
   const [visibility, setVisibility] = useState<'public' | 'internal'>('public')
+  /** Valor valor. */
   const [error, setError] = useState('')
+  /** Valor mutation. */
   const mutation = useMutation({
     mutationFn: () =>
       api(`/api/tickets/${ticketId}/messages`, {
@@ -109,7 +131,10 @@ function Composer({ ticketId, allowInternal }: { ticketId: string; allowInternal
       setError('')
       await client.invalidateQueries({ queryKey: ['workspace'] })
     },
-    onError: (reason) => setError(reason instanceof ApiError ? reason.message : 'Could not send.'),
+    onError: (reason) =>
+      setError(
+        reason instanceof ApiError ? translateError(reason.message, t) : t('ticket.sendError'),
+      ),
   })
   return (
     <form
@@ -122,60 +147,78 @@ function Composer({ ticketId, allowInternal }: { ticketId: string; allowInternal
       {allowInternal ? (
         <div className={styles.actions}>
           <button type="button" className={styles.quiet} onClick={() => setVisibility('public')}>
-            Reply to customer {visibility === 'public' ? '· on' : ''}
+            {t('ticket.replyToCustomer')} {visibility === 'public' ? `· ${t('common.active')}` : ''}
           </button>
           <button type="button" className={styles.quiet} onClick={() => setVisibility('internal')}>
-            Internal note {visibility === 'internal' ? '· on' : ''}
+            {t('ticket.internalNote')} {visibility === 'internal' ? `· ${t('common.active')}` : ''}
           </button>
         </div>
       ) : null}
       <label>
-        Message
+        {t('ticket.message')}
         <textarea value={body} onChange={(event) => setBody(event.target.value)} />
       </label>
       {error ? <p className={styles.error}>{error}</p> : null}
       <button className={styles.primary} type="submit" disabled={mutation.isPending}>
-        {visibility === 'internal' ? 'Save note' : 'Send reply'}
+        {visibility === 'internal' ? t('ticket.saveNote') : t('ticket.sendReply')}
       </button>
     </form>
   )
 }
 
+/** Executa TakeButton. */
 function TakeButton({ ticketId }: { ticketId: string }) {
+  /** Valor valor. */
+  const { t } = useTranslation()
+  /** Valor client. */
   const client = useQueryClient()
+  /** Valor mutation. */
   const mutation = useMutation({
     mutationFn: () => api(`/api/tickets/${ticketId}/take`, { method: 'POST' }),
     onSuccess: () => client.invalidateQueries({ queryKey: ['workspace'] }),
   })
   return (
     <button className={styles.primary} type="button" onClick={() => mutation.mutate()}>
-      Take ticket
+      {t('ticket.take')}
     </button>
   )
 }
 
+/** Executa ReopenButton. */
 function ReopenButton({ ticketId }: { ticketId: string }) {
+  /** Valor valor. */
+  const { t } = useTranslation()
+  /** Valor client. */
   const client = useQueryClient()
+  /** Valor mutation. */
   const mutation = useMutation({
     mutationFn: () =>
       api(`/api/tickets/${ticketId}/status`, {
         method: 'POST',
-        body: JSON.stringify({ to: 'open', reason: 'Still not resolved' }),
+        body: JSON.stringify({ to: 'open', reason: t('portal.stillOpen') }),
       }),
     onSuccess: () => client.invalidateQueries({ queryKey: ['workspace'] }),
   })
   return (
     <button className={styles.primary} type="button" onClick={() => mutation.mutate()}>
-      Reopen
+      {t('ticket.reopen')}
     </button>
   )
 }
 
+/** Executa StatusDialog. */
 function StatusDialog({ ticket, viewer }: { ticket: WireTicket; viewer: User }) {
+  /** Valor valor. */
+  const { t } = useTranslation()
+  /** Valor client. */
   const client = useQueryClient()
+  /** Valor valor. */
   const [reason, setReason] = useState('')
+  /** Valor valor. */
   const [to, setTo] = useState(nextStatuses(ticket.status, viewer.role)[0] ?? ticket.status)
+  /** Valor valor. */
   const [error, setError] = useState('')
+  /** Valor mutation. */
   const mutation = useMutation({
     mutationFn: () =>
       api(`/api/tickets/${ticket.id}/status`, {
@@ -187,34 +230,39 @@ function StatusDialog({ ticket, viewer }: { ticket: WireTicket; viewer: User }) 
       await client.invalidateQueries({ queryKey: ['workspace'] })
     },
     onError: (reasonError) =>
-      setError(reasonError instanceof ApiError ? reasonError.message : 'Could not change status.'),
+      setError(
+        reasonError instanceof ApiError
+          ? translateError(reasonError.message, t)
+          : t('ticket.statusError'),
+      ),
   })
+  /** Valor options. */
   const options = nextStatuses(ticket.status, viewer.role)
   return (
     <Dialog.Root>
-      <Dialog.Trigger className={styles.quiet}>Change status</Dialog.Trigger>
+      <Dialog.Trigger className={styles.quiet}>{t('ticket.changeStatus')}</Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className={styles.dialogOverlay} />
         <Dialog.Content className={styles.dialog}>
-          <Dialog.Title>Change status</Dialog.Title>
-          <Dialog.Description>The reason stays on the timeline.</Dialog.Description>
+          <Dialog.Title>{t('ticket.changeStatus')}</Dialog.Title>
+          <Dialog.Description>{t('ticket.reasonStays')}</Dialog.Description>
           <label>
-            Status
+            {t('ticket.status')}
             <select value={to} onChange={(event) => setTo(event.target.value as typeof to)}>
               {options.map((status) => (
                 <option key={status} value={status}>
-                  {status}
+                  {t(`status.${status}`)}
                 </option>
               ))}
             </select>
           </label>
           <label>
-            Reason
+            {t('ticket.reason')}
             <textarea value={reason} onChange={(event) => setReason(event.target.value)} />
           </label>
           {error ? <p className={styles.error}>{error}</p> : null}
           <button className={styles.primary} type="button" onClick={() => mutation.mutate()}>
-            Save status
+            {t('ticket.saveStatus')}
           </button>
         </Dialog.Content>
       </Dialog.Portal>
@@ -222,10 +270,17 @@ function StatusDialog({ ticket, viewer }: { ticket: WireTicket; viewer: User }) 
   )
 }
 
+/** Executa Reassign. */
 function Reassign({ ticketId, users }: { ticketId: string; users: User[] }) {
+  /** Valor valor. */
+  const { t } = useTranslation()
+  /** Valor consultants. */
   const consultants = users.filter((user) => user.role === 'consultant')
+  /** Valor valor. */
   const [consultantId, setConsultantId] = useState(consultants[0]?.id ?? '')
+  /** Valor client. */
   const client = useQueryClient()
+  /** Valor mutation. */
   const mutation = useMutation({
     mutationFn: () =>
       api(`/api/tickets/${ticketId}/assign`, {
@@ -250,7 +305,7 @@ function Reassign({ ticketId, users }: { ticketId: string; users: User[] }) {
         ))}
       </select>
       <button className={styles.quiet} type="submit">
-        Reassign
+        {t('ticket.reassign')}
       </button>
     </form>
   )

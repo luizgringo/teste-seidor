@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router'
 import { Shell } from '@/app/Shell.tsx'
 import { LoginPage } from '@/features/auth/LoginPage.tsx'
@@ -28,9 +29,13 @@ export function AppRouter() {
   )
 }
 
+/** Executa RequirePersona. */
 function RequirePersona() {
+  /** Valor valor. */
+  const { t } = useTranslation()
+  /** Valor session. */
   const session = useSession()
-  if (session.isLoading) return <p>Loading the desk…</p>
+  if (session.isLoading) return <p>{t('common.loadingDesk')}</p>
   if (!session.data) return <Navigate to="/login" replace />
   if (!session.data.persona) return <Navigate to="/session" replace />
   return (
@@ -40,19 +45,26 @@ function RequirePersona() {
   )
 }
 
+/** Executa HomeSwitch. */
 function HomeSwitch() {
+  /** Valor session. */
   const session = useSession()
+  /** Valor role. */
   const role = session.data?.persona?.role
   return <Navigate to={role === 'manager' ? '/team' : '/queue'} replace />
 }
 
+/** Executa QueueSwitch. */
 function QueueSwitch() {
+  /** Valor session. */
   const session = useSession()
   if (session.data?.persona?.role === 'customer') return <PortalPage />
   return <QueuePage />
 }
 
+/** Executa TicketSwitch. */
 function TicketSwitch() {
+  /** Valor session. */
   const session = useSession()
   if (session.data?.persona?.role === 'customer') return <CustomerTicketPage />
   return <QueuePage />
