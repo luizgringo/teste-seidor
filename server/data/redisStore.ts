@@ -2,6 +2,14 @@ import { Redis } from '@upstash/redis'
 import type { AppState, DomainEvent } from '../../src/features/tickets/domain/types.ts'
 import type { StoreListener, TicketStore } from './memoryStore.ts'
 
+/** A Vercel nomeia o Redis como KV_*; o cliente Upstash também aceita UPSTASH_REDIS_*. */
+export function redisConfigured(): boolean {
+  return Boolean(
+    (process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL) &&
+      (process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN),
+  )
+}
+
 /** Valor STATE_KEY. */
 const STATE_KEY = 'itsm:state'
 /** Valor EVENTS_KEY. */

@@ -121,9 +121,9 @@ A jornada no navegador está em `tests/e2e/desk.spec.ts`. O critério do que ent
 
 ## Endereço público
 
-A demonstração está em https://teste-seidor-navy.vercel.app. A proteção de acesso da Vercel está desligada. O login da aplicação ainda depende de um OAuth App do GitHub: sem `GITHUB_CLIENT_ID` e `GITHUB_CLIENT_SECRET` no painel da Vercel, a tela abre e avisa que o GitHub não está configurado. O preview local não existe nesse endereço.
+A demonstração está em https://teste-seidor-navy.vercel.app. A proteção de acesso da Vercel está desligada. O login usa o OAuth App Northline Support: a pessoa entra com o GitHub e escolhe Marina, Ricardo ou Helena. O preview local não existe nesse endereço. O estado dos chamados fica no Redis da integração Upstash.
 
-Quando o OAuth App existir, a callback de produção é `https://teste-seidor-navy.vercel.app/auth/github/callback`.
+A callback de produção é `https://teste-seidor-navy.vercel.app/auth/github/callback`.
 
 ## Onde ler o resto
 

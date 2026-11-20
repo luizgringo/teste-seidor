@@ -135,7 +135,12 @@ export function createApp(store: TicketStore) {
     /** Valor url. */
     const url = githubAuthorizeUrl(state)
     if (!url) return c.json({ message: 'errors.githubMissing' }, 400)
-    c.header('Set-Cookie', `itsm_oauth=${state}; HttpOnly; Path=/; Max-Age=600; SameSite=Lax`)
+    /** Valor secure. */
+    const secure = process.env.VERCEL ? '; Secure' : ''
+    c.header(
+      'Set-Cookie',
+      `itsm_oauth=${state}; HttpOnly; Path=/; Max-Age=600; SameSite=Lax${secure}`,
+    )
     return c.redirect(url)
   })
 

@@ -3,7 +3,7 @@ import { WebSocketServer } from 'ws'
 import { createApp } from './createApp.ts'
 import { buildState } from './data/blueprint.ts'
 import { createMemoryStore } from './data/memoryStore.ts'
-import { createRedisStore } from './data/redisStore.ts'
+import { createRedisStore, redisConfigured } from './data/redisStore.ts'
 import { loadLocalEnv } from './env.ts'
 
 loadLocalEnv()
@@ -11,10 +11,7 @@ loadLocalEnv()
 /** Valor state. */
 const state = buildState(Date.now(), process.env.SEED_VERSION ?? '2026-11-20')
 /** Valor store. */
-const store =
-  process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
-    ? createRedisStore(state)
-    : createMemoryStore(state)
+const store = redisConfigured() ? createRedisStore(state) : createMemoryStore(state)
 
 /** Valor websocket. */
 const websocket = new WebSocketServer({ noServer: true })
