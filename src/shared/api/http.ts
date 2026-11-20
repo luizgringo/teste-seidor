@@ -1,4 +1,4 @@
-/** Failure from the JSON API, with the HTTP status preserved. */
+/** Falha da API JSON, com o status HTTP preservado. */
 export class ApiError extends Error {
   /** Campo status. */
   readonly status: number
@@ -10,7 +10,7 @@ export class ApiError extends Error {
   }
 }
 
-/** Sends a same-origin JSON request and returns the parsed body. */
+/** Envia um pedido JSON no mesmo endereço e devolve o corpo interpretado. */
 export async function api<T>(path: string, init?: RequestInit): Promise<T> {
   /** Valor response. */
   const response = await fetch(path, {

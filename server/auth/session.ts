@@ -3,14 +3,14 @@ import { createHmac, timingSafeEqual } from 'node:crypto'
 /** Valor COOKIE. */
 const COOKIE = 'itsm_session'
 
-/** Who authenticated, and which persona they are viewing as. */
+/** Quem autenticou e qual persona está vendo. */
 export type Session = {
   githubLogin: string
   githubName: string
   personaId: string | null
 }
 
-/** Serializes a session into a signed cookie value. */
+/** Serializa a sessão num valor de cookie assinado. */
 export function encodeSession(session: Session, secret: string): string {
   /** Valor payload. */
   const payload = Buffer.from(JSON.stringify(session)).toString('base64url')
@@ -19,7 +19,7 @@ export function encodeSession(session: Session, secret: string): string {
   return `${payload}.${mac}`
 }
 
-/** Reads the session cookie. Returns null when the signature does not match. */
+/** Lê o cookie da sessão. Devolve nulo quando a assinatura não confere. */
 export function readSession(cookieHeader: string | undefined, secret: string): Session | null {
   /** Valor raw. */
   const raw = cookieValue(cookieHeader, COOKIE)
@@ -48,14 +48,14 @@ export function readSession(cookieHeader: string | undefined, secret: string): S
   }
 }
 
-/** Set-Cookie header for the session. */
+/** Cabeçalho Set-Cookie da sessão. */
 export function sessionCookie(session: Session, secret: string): string {
   /** Valor secure. */
   const secure = process.env.VERCEL ? '; Secure' : ''
   return `${COOKIE}=${encodeSession(session, secret)}; HttpOnly; Path=/; SameSite=Lax; Max-Age=43200${secure}`
 }
 
-/** Clears the session cookie. */
+/** Apaga o cookie da sessão. */
 export function clearSessionCookie(): string {
   /** Valor secure. */
   const secure = process.env.VERCEL ? '; Secure' : ''

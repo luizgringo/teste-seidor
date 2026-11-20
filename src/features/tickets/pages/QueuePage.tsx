@@ -6,7 +6,7 @@ import { TicketPanel } from '@/features/tickets/components/TicketPanel.tsx'
 import { queueSections } from '@/features/tickets/domain/queue.ts'
 import { useTicketStream, useWorkspace } from '@/features/tickets/hooks/useWorkspace.ts'
 
-/** Consultant and manager queue, with the open ticket beside it. */
+/** Fila da consultora e do gestor, com o chamado aberto ao lado. */
 export function QueuePage() {
   /** Valor valor. */
   const { t } = useTranslation()

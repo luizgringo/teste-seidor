@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 
-/** Reads local env files without overriding variables already set by the process. */
+/** Lê os arquivos locais de ambiente sem substituir variável que o processo já definiu. */
 export function loadLocalEnv(): void {
   if (process.env.VERCEL) return
   for (const file of ['.env', '.env.development']) {

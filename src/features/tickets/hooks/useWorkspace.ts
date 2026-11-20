@@ -4,7 +4,7 @@ import type { ClientEvent, Workspace } from '@/features/tickets/domain/types.ts'
 import { reduceWorkspace } from '@/features/tickets/domain/workspace.ts'
 import { api } from '@/shared/api/http.ts'
 
-/** Loads the desk already filtered for the current persona. */
+/** Carrega a mesa já filtrada para a persona atual. */
 export function useWorkspace() {
   return useQuery({
     queryKey: ['workspace'],
@@ -12,7 +12,7 @@ export function useWorkspace() {
   })
 }
 
-/** Applies socket events onto the workspace without touching an open draft. */
+/** Aplica os eventos do socket na mesa sem mexer num rascunho aberto. */
 export function useTicketStream(enabled: boolean) {
   /** Valor client. */
   const client = useQueryClient()

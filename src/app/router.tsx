@@ -10,7 +10,7 @@ import { PortalPage } from '@/features/portal/PortalPage.tsx'
 import { TeamPage } from '@/features/team/TeamPage.tsx'
 import { QueuePage } from '@/features/tickets/pages/QueuePage.tsx'
 
-/** Routes for the desk. Persona choice decides which screen a path renders. */
+/** Rotas da mesa. A persona decide qual tela um caminho desenha. */
 export function AppRouter() {
   return (
     <BrowserRouter>

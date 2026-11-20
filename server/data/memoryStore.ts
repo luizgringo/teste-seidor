@@ -9,14 +9,14 @@ export type StoreChange = {
 /** Tipo StoreListener. */
 export type StoreListener = (event: DomainEvent, state: AppState) => void
 
-/** Tenant snapshot shared by HTTP and the socket. */
+/** Retrato do tenant compartilhado pelo HTTP e pelo socket. */
 export type TicketStore = {
   read: () => Promise<AppState>
   commit: (change: (state: AppState) => StoreChange) => Promise<DomainEvent[]>
   subscribe: (listener: StoreListener) => () => void
 }
 
-/** In-process store used in local development and tests. */
+/** Loja no processo, usada no desenvolvimento local e nos testes. */
 export function createMemoryStore(initial: AppState): TicketStore {
   /** Valor state. */
   let state = initial

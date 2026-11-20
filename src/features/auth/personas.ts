@@ -1,4 +1,4 @@
-/** Stable persona ids shared by the mock tenant, the session screen, and the tests. */
+/** Ids estáveis das personas, compartilhados pelo mock, pela tela de sessão e pelos testes. */
 export const PERSONA = {
   helena: '11111111-1111-4111-8111-000000000001',
   marina: '11111111-1111-4111-8111-000000000002',

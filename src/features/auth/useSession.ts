@@ -14,7 +14,7 @@ export type DeskConfig = {
   devSession: boolean
 }
 
-/** The signed-in GitHub user and the persona they are viewing as. Null means signed out. */
+/** A pessoa autenticada no GitHub e a persona que ela está vendo. Nulo significa que saiu. */
 export function useSession() {
   return useQuery({
     queryKey: ['session'],
@@ -28,7 +28,7 @@ export function useSession() {
   })
 }
 
-/** Whether GitHub and the local preview entry are available. */
+/** Diz se o GitHub e a prévia local estão disponíveis. */
 export function useDeskConfig() {
   return useQuery({
     queryKey: ['config'],

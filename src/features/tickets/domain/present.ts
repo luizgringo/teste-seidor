@@ -11,7 +11,7 @@ import type {
   Workspace,
 } from './types.ts'
 
-/** Ticket projection for the viewer. Null when the ticket is outside their scope. */
+/** Projeção do chamado para quem olha. Nulo quando o chamado está fora do alcance. */
 export function presentTicket(ticket: Ticket, viewer: User): WireTicket | null {
   if (!canAccess(viewer, ticket)) return null
   /** Valor staff. */
@@ -33,14 +33,14 @@ export function presentTicket(ticket: Ticket, viewer: User): WireTicket | null {
   }
 }
 
-/** Message projection. Internal notes disappear for customers. */
+/** Projeção da mensagem. A nota interna some para o cliente. */
 export function presentMessage(message: Message, ticket: Ticket, viewer: User): Message | null {
   if (!canAccess(viewer, ticket)) return null
   if (viewer.role === 'customer' && message.visibility === 'internal') return null
   return message
 }
 
-/** Event projection. Returns null when the viewer must not learn that it happened. */
+/** Projeção do evento. Devolve nulo quando quem olha não pode saber que ele aconteceu. */
 export function presentEvent(
   event: DomainEvent,
   state: AppState,
@@ -74,7 +74,7 @@ export function presentEvent(
   }
 }
 
-/** Screen snapshot for one persona. Hidden fields are removed, not just styled away. */
+/** Retrato da tela para uma persona. Os campos ocultos saem do JSON, não só do visual. */
 export function presentWorkspace(state: AppState, viewerId: string): Workspace | null {
   /** Valor viewer. */
   const viewer = state.users.find((user) => user.id === viewerId)

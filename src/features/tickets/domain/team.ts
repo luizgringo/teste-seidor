@@ -6,7 +6,7 @@ import type { AppState, ConsultantLoad } from './types.ts'
 /** Valor WEEK_MS. */
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000
 
-/** One row per consultant, busiest and most at risk first. */
+/** Uma linha por consultor, os mais ocupados e em risco primeiro. */
 export function teamLoad(state: AppState, nowMs: number): ConsultantLoad[] {
   /** Valor windowStart. */
   const windowStart = nowMs - WEEK_MS

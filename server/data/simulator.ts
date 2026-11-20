@@ -8,7 +8,7 @@ const REPLIES = [
   'This is blocking the team this afternoon.',
 ]
 
-/** Emits a public reply on a random in-progress ticket so the desk moves while someone is reading. */
+/** Emite uma resposta pública num chamado em atendimento, para a mesa se mover enquanto alguém lê. */
 export function startSimulator(store: TicketStore): () => void {
   /** Valor timer. */
   const timer = setInterval(() => {

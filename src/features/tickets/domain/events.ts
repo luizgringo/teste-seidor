@@ -1,8 +1,8 @@
 import type { AppState, Assignment, DomainEvent, Message, StatusChange, Ticket } from './types.ts'
 
 /**
- * Folds one event into the tenant snapshot.
- * An event id that was already applied leaves the snapshot unchanged.
+ * Aplica um evento no retrato do tenant.
+ * Um id de evento já aplicado deixa o retrato igual.
  */
 export function applyEvent(state: AppState, event: DomainEvent): AppState {
   if (state.seenEventIds.includes(event.id)) return state

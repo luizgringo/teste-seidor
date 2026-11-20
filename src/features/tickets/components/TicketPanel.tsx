@@ -16,7 +16,7 @@ type TicketPanelProps = {
   nowMs: number
 }
 
-/** Conversation, reply box, and the facts beside it. The draft lives in the composer. */
+/** Conversa, caixa de resposta e os fatos ao lado. O rascunho fica no compositor. */
 export function TicketPanel({ ticket, workspace, nowMs }: TicketPanelProps) {
   /** Valor valor. */
   const { t } = useTranslation()

@@ -1,10 +1,10 @@
-/** Roles that share one ITSM tenant. */
+/** Papéis que compartilham um tenant de ITSM. */
 export const ROLES = ['customer', 'consultant', 'manager'] as const
 
-/** A person's relationship to the support desk. */
+/** Relação da pessoa com a mesa de suporte. */
 export type Role = (typeof ROLES)[number]
 
-/** Ticket lifecycle values stored on the wire. */
+/** Valores do ciclo do chamado no contrato. */
 export const TICKET_STATUSES = [
   'open',
   'in_progress',
@@ -13,22 +13,22 @@ export const TICKET_STATUSES = [
   'closed',
 ] as const
 
-/** Where a ticket sits in its lifecycle. */
+/** Onde o chamado está no ciclo de vida. */
 export type TicketStatus = (typeof TICKET_STATUSES)[number]
 
-/** Internal urgency. Customers never receive this value. */
+/** Urgência interna. O cliente nunca recebe este valor. */
 export const PRIORITIES = ['critical', 'high', 'medium', 'low'] as const
 
-/** Internal urgency used to compute the due instant. */
+/** Urgência interna usada para calcular o vencimento. */
 export type Priority = (typeof PRIORITIES)[number]
 
 /** Who is allowed to read a message. */
 export const MESSAGE_VISIBILITIES = ['public', 'internal'] as const
 
-/** Public replies are visible to the requester. Internal notes are not. */
+/** A resposta pública aparece para quem abriu. A nota interna não. */
 export type MessageVisibility = (typeof MESSAGE_VISIBILITIES)[number]
 
-/** A person who can sign in as a persona. */
+/** Pessoa que pode entrar como uma persona. */
 export type User = {
   id: string
   name: string
@@ -38,13 +38,13 @@ export type User = {
   timeZone: string
 }
 
-/** A support queue that owns tickets. */
+/** Fila de atendimento que possui os chamados. */
 export type Group = {
   id: string
   name: string
 }
 
-/** A support request, including fields hidden from customers. */
+/** Pedido de suporte, inclusive os campos ocultos do cliente. */
 export type Ticket = {
   id: string
   number: string
@@ -70,7 +70,7 @@ export type Message = {
   createdAt: string
 }
 
-/** A recorded status transition. */
+/** Transição de status registrada. */
 export type StatusChange = {
   id: string
   ticketId: string
@@ -81,7 +81,7 @@ export type StatusChange = {
   occurredAt: string
 }
 
-/** A span during which a person owned a ticket. */
+/** Intervalo em que uma pessoa foi responsável pelo chamado. */
 export type Assignment = {
   id: string
   ticketId: string
@@ -90,7 +90,7 @@ export type Assignment = {
   endedAt: string | null
 }
 
-/** Ticket fields safe to render for the current viewer. */
+/** Campos do chamado seguros para desenhar para quem está olhando. */
 export type WireTicket = {
   id: string
   number: string
@@ -107,7 +107,7 @@ export type WireTicket = {
   groupId: string | null
 }
 
-/** A ticket was created. */
+/** Um chamado foi criado. */
 export type TicketOpenedEvent = {
   id: string
   type: 'ticket.opened'
@@ -115,7 +115,7 @@ export type TicketOpenedEvent = {
   payload: Ticket
 }
 
-/** A ticket gained or changed owner. */
+/** Um chamado ganhou ou trocou de responsável. */
 export type TicketAssignedEvent = {
   id: string
   type: 'ticket.assigned'
@@ -126,7 +126,7 @@ export type TicketAssignedEvent = {
   }
 }
 
-/** A message was added to a ticket. */
+/** Uma mensagem foi adicionada a um chamado. */
 export type MessageAddedEvent = {
   id: string
   type: 'message.added'
@@ -134,7 +134,7 @@ export type MessageAddedEvent = {
   payload: Message
 }
 
-/** A ticket moved from one status to another. */
+/** Um chamado passou de um status para outro. */
 export type StatusChangedEvent = {
   id: string
   type: 'status.changed'
@@ -148,14 +148,14 @@ export type StatusChangedEvent = {
   }
 }
 
-/** A domain fact stored by the server. The same id may be delivered twice. */
+/** Fato do domínio guardado pelo servidor. O mesmo id pode chegar duas vezes. */
 export type DomainEvent =
   | TicketOpenedEvent
   | TicketAssignedEvent
   | MessageAddedEvent
   | StatusChangedEvent
 
-/** Ticket-opened event after hidden fields are removed for the viewer. */
+/** Evento de abertura depois que os campos ocultos saem para quem olha. */
 export type ClientTicketOpenedEvent = {
   id: string
   type: 'ticket.opened'
@@ -163,14 +163,14 @@ export type ClientTicketOpenedEvent = {
   payload: WireTicket
 }
 
-/** A domain fact after it has been filtered for one viewer. */
+/** Fato do domínio depois de filtrado para uma pessoa. */
 export type ClientEvent =
   | ClientTicketOpenedEvent
   | TicketAssignedEvent
   | MessageAddedEvent
   | StatusChangedEvent
 
-/** The in-memory or Redis snapshot of one tenant. */
+/** Retrato em memória ou no Redis de um tenant. */
 export type AppState = {
   seedVersion: string
   users: User[]
@@ -182,7 +182,7 @@ export type AppState = {
   seenEventIds: string[]
 }
 
-/** What the signed-in person is allowed to do with one ticket. */
+/** O que a pessoa autenticada pode fazer com um chamado. */
 export type Capabilities = {
   canOpenTicket: boolean
   canViewTeam: boolean
@@ -196,7 +196,7 @@ export type Capabilities = {
   canReopen: boolean
 }
 
-/** Screen data already filtered for one viewer. */
+/** Dados da tela já filtrados para quem olha. */
 export type Workspace = {
   viewer: User
   users: User[]
@@ -207,7 +207,7 @@ export type Workspace = {
   seenEventIds: string[]
 }
 
-/** Workload of one consultant for the manager's board. */
+/** Carga de um consultor no quadro do gestor. */
 export type ConsultantLoad = {
   consultantId: string
   name: string

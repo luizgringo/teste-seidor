@@ -10,8 +10,8 @@ const NEXT: Record<TicketStatus, readonly TicketStatus[]> = {
 }
 
 /**
- * Returns whether this role may move a ticket between two statuses.
- * Customers may only reopen a closed ticket.
+ * Diz se este papel pode mover o chamado entre dois status.
+ * O cliente só pode reabrir um chamado fechado.
  */
 export function canMoveStatus(from: TicketStatus, to: TicketStatus, role: Role): boolean {
   if (!NEXT[from].includes(to)) return false
@@ -19,12 +19,12 @@ export function canMoveStatus(from: TicketStatus, to: TicketStatus, role: Role):
   return true
 }
 
-/** Resolved and closed tickets leave the working queue. */
+/** Chamados resolvidos e fechados saem da fila de trabalho. */
 export function isDone(status: TicketStatus): boolean {
   return status === 'resolved' || status === 'closed'
 }
 
-/** Statuses a role may move to from the current one. */
+/** Status para os quais um papel pode ir a partir do atual. */
 export function nextStatuses(from: TicketStatus, role: Role): TicketStatus[] {
   return NEXT[from].filter((status) => canMoveStatus(from, status, role))
 }

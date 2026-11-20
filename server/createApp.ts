@@ -31,7 +31,7 @@ type LiveClient = {
   personaId: string | null
 }
 
-/** HTTP and WebSocket application bound to a ticket store. */
+/** Aplicação HTTP e WebSocket ligada à loja de chamados. */
 export function createApp(store: TicketStore) {
   /** Valor app. */
   const app = new Hono()
@@ -289,7 +289,7 @@ export function createApp(store: TicketStore) {
   return app
 }
 
-/** Starts the HTTP server and the WebSocket upgrade on one port. */
+/** Sobe o HTTP e o upgrade do WebSocket na mesma porta. */
 export function listen(app: Hono, port: number) {
   /** Valor websocket. */
   const websocket = new WebSocketServer({ noServer: true })

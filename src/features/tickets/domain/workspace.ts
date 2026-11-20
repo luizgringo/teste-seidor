@@ -2,8 +2,8 @@ import { statusLabel } from './labels.ts'
 import type { ClientEvent, StatusChange, Workspace } from './types.ts'
 
 /**
- * Folds a viewer-specific event into the screen snapshot.
- * A repeated event id does not add a second message or status row.
+ * Aplica um evento já filtrado no retrato da tela.
+ * O mesmo id de evento não cria outra mensagem nem outra linha de status.
  */
 export function reduceWorkspace(workspace: Workspace, event: ClientEvent): Workspace {
   if (workspace.seenEventIds.includes(event.id)) return workspace

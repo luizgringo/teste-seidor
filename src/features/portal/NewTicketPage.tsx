@@ -9,7 +9,7 @@ import { ApiError, api } from '@/shared/api/http.ts'
 import { translateError } from '@/shared/i18n/format.ts'
 import styles from './portal.module.css'
 
-/** Opens a ticket. Customers are not asked for category, group, or priority. */
+/** Abre um chamado. O cliente não escolhe categoria, grupo nem prioridade. */
 export function NewTicketPage() {
   /** Valor valor. */
   const { t } = useTranslation()

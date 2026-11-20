@@ -10,8 +10,8 @@ const EVENTS_KEY = 'itsm:events'
 const LOCK_KEY = 'itsm:lock'
 
 /**
- * Shared snapshot for Vercel, where each socket stays on the instance that accepted it.
- * A short lock keeps two writes from dropping each other's event.
+ * Retrato compartilhado na Vercel, onde cada socket fica na instância que o aceitou.
+ * Um bloqueio curto impede que duas gravações apaguem o evento uma da outra.
  */
 export function createRedisStore(initial: AppState): TicketStore {
   /** Valor redis. */

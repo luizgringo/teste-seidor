@@ -1,7 +1,7 @@
 import { canMoveStatus, isDone } from './status.ts'
 import type { Capabilities, TicketStatus, User } from './types.ts'
 
-/** Fields the permission check needs. Hidden fields may already be null. */
+/** Campos de que a permissão precisa. O que está oculto pode já vir nulo. */
 export type AccessibleTicket = {
   requesterId: string
   assigneeId: string | null
@@ -9,14 +9,14 @@ export type AccessibleTicket = {
   status: TicketStatus
 }
 
-/** Whether this person may see the ticket at all. */
+/** Diz se esta pessoa pode ver o chamado. */
 export function canAccess(actor: User, ticket: AccessibleTicket): boolean {
   if (actor.role === 'manager') return true
   if (actor.role === 'customer') return ticket.requesterId === actor.id
   return ticket.groupId !== null && ticket.groupId === actor.groupId
 }
 
-/** Actions the screen may offer for this ticket. Pass null when no ticket is open. */
+/** Ações que a tela pode oferecer neste chamado. Passe nulo quando nenhum chamado está aberto. */
 export function capabilitiesFor(actor: User, ticket: AccessibleTicket | null): Capabilities {
   /** Valor staff. */
   const staff = actor.role !== 'customer'

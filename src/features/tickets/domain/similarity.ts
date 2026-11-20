@@ -23,8 +23,8 @@ const STOP_WORDS = new Set([
 ])
 
 /**
- * Suggests a closed ticket that looks like the text being typed.
- * The score is the share of meaningful words in the draft that also appear on the closed ticket.
+ * Sugere um chamado fechado parecido com o texto que está sendo escrito.
+ * A nota é a fração das palavras relevantes do rascunho que também aparecem no chamado fechado.
  */
 export function suggestReopen(description: string, closedTickets: Ticket[]): Ticket | null {
   /** Valor draft. */

@@ -1,6 +1,6 @@
 import type { Priority } from './types.ts'
 
-/** Clock-hour targets. Business calendars are intentionally out of this slice. */
+/** Metas em hora corrida. Calendário de expediente fica de fora desta fatia. */
 export const SLA_MINUTES: Record<Priority, number> = {
   critical: 4 * 60,
   high: 8 * 60,
@@ -8,15 +8,15 @@ export const SLA_MINUTES: Record<Priority, number> = {
   low: 72 * 60,
 }
 
-/** Due within this many minutes is "about to breach". */
+/** Vencimento dentro deste número de minutos conta como perto de estourar. */
 export const AT_RISK_MINUTES = 120
 
 /** Tipo DueTone. */
 export type DueTone = 'breached' | 'soon' | 'ok'
 
 /**
- * Distance from now to the due instant, in clock minutes.
- * Business-hour calendars are not applied. Upgrade path: subtract the group's closed hours before comparing.
+ * Distância de agora até o vencimento, em minutos corridos.
+ * Calendário de expediente não entra. O passo seguinte é descontar as horas fechadas do grupo antes de comparar.
  */
 export function dueState(dueAt: string, nowMs: number): { minutes: number; tone: DueTone } {
   /** Valor minutes. */
@@ -26,7 +26,7 @@ export function dueState(dueAt: string, nowMs: number): { minutes: number; tone:
   return { minutes, tone: 'ok' }
 }
 
-/** Short clock label for a queue row. */
+/** Rótulo curto do prazo numa linha da fila. */
 export function dueLabel(dueAt: string, nowMs: number): string {
   /** Valor valor. */
   const { minutes, tone } = dueState(dueAt, nowMs)
@@ -42,7 +42,7 @@ export function dueLabel(dueAt: string, nowMs: number): string {
   return `Vence em ${text}`
 }
 
-/** Soonest due first, which also puts breached tickets at the top. */
+/** O prazo mais próximo vem primeiro, e o estourado fica no topo. */
 export function compareByDue(left: { dueAt: string }, right: { dueAt: string }): number {
   return Date.parse(left.dueAt) - Date.parse(right.dueAt)
 }

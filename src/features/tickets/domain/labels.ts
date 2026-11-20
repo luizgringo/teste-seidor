@@ -1,7 +1,7 @@
 import type { TicketStatus } from './types.ts'
 
 /**
- * Plain-language status for someone who does not know the internal workflow.
+ * Status em linguagem simples, para quem não conhece o fluxo interno.
  */
 export function statusLabel(status: TicketStatus): string {
   switch (status) {

@@ -1,8 +1,8 @@
 import type { Assignment } from './types.ts'
 
 /**
- * Minutes in the window during which the consultant had no open assignment.
- * Overlapping assignments count once.
+ * Minutos da janela em que o consultor ficou sem atribuição aberta.
+ * Atribuições sobrepostas contam uma vez só.
  */
 export function idleMinutes(
   consultantId: string,

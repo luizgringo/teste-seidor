@@ -4,7 +4,7 @@ import { AppRouter } from '@/app/router.tsx'
 /** Valor queryClient. */
 const queryClient = new QueryClient()
 
-/** Application root: server cache and routes. */
+/** Raiz da aplicação: cache do servidor e rotas. */
 export function App() {
   return (
     <QueryClientProvider client={queryClient}>

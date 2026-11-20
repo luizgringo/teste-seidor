@@ -4,7 +4,7 @@ import { SLA_MINUTES } from './sla.ts'
 import { canMoveStatus } from './status.ts'
 import type { AppState, DomainEvent, Priority, Ticket, User } from './types.ts'
 
-/** Clock and id factory supplied by the server so tests stay deterministic. */
+/** Relógio e fábrica de ids vindos do servidor, para o teste continuar determinístico. */
 export type CommandContext = {
   now: string
   createId: () => string
@@ -15,7 +15,7 @@ export type CommandResult =
   | { ok: true; state: AppState; events: DomainEvent[] }
   | { ok: false; status: 400 | 403 | 404; message: string }
 
-/** Opens a ticket. Customers do not choose priority, group, or category. */
+/** Abre um chamado. O cliente não escolhe prioridade, grupo nem categoria. */
 export function openTicket(
   state: AppState,
   actor: User,
@@ -59,7 +59,7 @@ export function openTicket(
   return ok(applyEvent(state, event), [event])
 }
 
-/** Adds a public reply or an internal note. */
+/** Adiciona uma resposta pública ou uma nota interna. */
 export function addMessage(
   state: AppState,
   actor: User,
@@ -99,7 +99,7 @@ export function addMessage(
   return ok(applyEvent(state, event), [event])
 }
 
-/** Moves a ticket and keeps the reason on the timeline. */
+/** Move o chamado e guarda o motivo na linha do tempo. */
 export function changeStatus(
   state: AppState,
   actor: User,
@@ -133,7 +133,7 @@ export function changeStatus(
   return ok(applyEvent(state, event), [event])
 }
 
-/** Claims an unassigned ticket in the consultant's group. */
+/** Assume um chamado sem responsável no grupo da consultora. */
 export function takeTicket(
   state: AppState,
   actor: User,
@@ -147,7 +147,7 @@ export function takeTicket(
   return assignTo(state, actor, ticket, actor.id, 'Ticket taken', context)
 }
 
-/** Moves a ticket to another consultant. Managers only. */
+/** Passa o chamado para outro consultor. Só o gestor. */
 export function assignTicket(
   state: AppState,
   actor: User,

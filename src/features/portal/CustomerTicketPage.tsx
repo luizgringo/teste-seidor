@@ -7,7 +7,7 @@ import { useTicketStream, useWorkspace } from '@/features/tickets/hooks/useWorks
 import { api } from '@/shared/api/http.ts'
 import styles from './portal.module.css'
 
-/** One request, with a marker for messages that arrived after the previous visit. */
+/** Um pedido, com a marca das mensagens que chegaram depois da visita anterior. */
 export function CustomerTicketPage() {
   /** Valor valor. */
   const { t } = useTranslation()

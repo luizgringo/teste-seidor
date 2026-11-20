@@ -1,6 +1,6 @@
 import type { AppState, Message, Ticket, User } from './types.ts'
 
-/** Helena, the customer in Lisbon. */
+/** Helena, a cliente em Lisboa. */
 export const helena: User = {
   id: 'user-helena',
   name: 'Helena Carvalho',
@@ -10,7 +10,7 @@ export const helena: User = {
   timeZone: 'Europe/Lisbon',
 }
 
-/** Marina, the consultant who lives in the queue. */
+/** Marina, a consultora que vive na fila. */
 export const marina: User = {
   id: 'user-marina',
   name: 'Marina Costa',
@@ -20,7 +20,7 @@ export const marina: User = {
   timeZone: 'America/Sao_Paulo',
 }
 
-/** Ricardo, the manager of the twelve consultants. */
+/** Ricardo, o gestor dos doze consultores. */
 export const ricardo: User = {
   id: 'user-ricardo',
   name: 'Ricardo Alves',
@@ -30,7 +30,7 @@ export const ricardo: User = {
   timeZone: 'America/Sao_Paulo',
 }
 
-/** A consultant outside Marina's group. */
+/** Um consultor fora do grupo da Marina. */
 export const diego: User = {
   id: 'user-diego',
   name: 'Diego Alves',
@@ -56,7 +56,7 @@ export const payrollTicket: Ticket = {
   updatedAt: '2026-11-20T08:00:00.000Z',
 }
 
-/** A note the customer must never receive. */
+/** Uma nota que o cliente nunca pode receber. */
 export const internalNote: Message = {
   id: 'message-internal',
   ticketId: payrollTicket.id,
@@ -66,7 +66,7 @@ export const internalNote: Message = {
   createdAt: '2026-11-20T09:00:00.000Z',
 }
 
-/** A tenant with the three personas and one open ticket. */
+/** Um tenant com as três personas e um chamado aberto. */
 export function emptyState(): AppState {
   return {
     seedVersion: 'test',
@@ -84,7 +84,7 @@ export function emptyState(): AppState {
   }
 }
 
-/** Fixed clock and ids for command tests. */
+/** Relógio e ids fixos para os testes de comando. */
 export function context(ids: string[]) {
   const queue = [...ids]
   return {

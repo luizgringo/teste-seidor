@@ -1,4 +1,4 @@
-/** Builds the GitHub authorize URL, or null when the app is not configured. */
+/** Monta a URL de autorização do GitHub, ou nulo quando o app não está configurado. */
 export function githubAuthorizeUrl(state: string): string | null {
   /** Valor clientId. */
   const clientId = process.env.GITHUB_CLIENT_ID
@@ -12,7 +12,7 @@ export function githubAuthorizeUrl(state: string): string | null {
   return url.toString()
 }
 
-/** Exchanges the callback code for the GitHub login. */
+/** Troca o código do callback pelo login do GitHub. */
 export async function githubIdentity(
   code: string,
 ): Promise<{ login: string; name: string } | null> {

@@ -12,14 +12,14 @@ import type {
 
 export { PERSONA }
 
-/** Support groups in the mock tenant. */
+/** Grupos de atendimento do tenant de exemplo. */
 export const GROUP = {
   applications: '22222222-2222-4222-8222-000000000001',
   infrastructure: '22222222-2222-4222-8222-000000000002',
   serviceDesk: '22222222-2222-4222-8222-000000000003',
 } as const
 
-/** Ticket the queue test looks for because it is about to breach. */
+/** Chamado que o teste da fila procura porque está perto de estourar. */
 export const PAYROLL_TITLE = 'Payroll export fails before the cutoff'
 
 /** Unassigned ticket Marina can take. */
@@ -28,7 +28,7 @@ export const PRINTER_TITLE = 'Printer on floor 3 is offline'
 /** Helena's open request. */
 export const HELENA_OPEN_TITLE = 'VPN from Lisbon fails'
 
-/** Closed request that should be suggested when Helena describes the same problem. */
+/** Pedido fechado que deve ser sugerido quando Helena descreve o mesmo problema. */
 export const HELENA_CLOSED_TITLE = 'VPN from Lisbon fails when the office network changes'
 
 /** Valor SYSTEMS. */

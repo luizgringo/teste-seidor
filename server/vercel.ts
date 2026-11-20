@@ -19,7 +19,7 @@ const store =
 /** Valor websocket. */
 const websocket = new WebSocketServer({ noServer: true })
 
-/** Node server exported for Vercel. Local development listens from server/index.ts. */
+/** Servidor Node exportado para a Vercel. O desenvolvimento local escuta em server/index.ts. */
 const server = createAdaptorServer({
   fetch: createApp(store).fetch,
   websocket: { server: websocket },
