@@ -1,0 +1,23 @@
+.page {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 28px 20px 64px;
+}
+
+.page table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface);
+}
+
+.page th,
+.page td {
+  text-align: left;
+  padding: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.page th:nth-child(n + 2),
+.page td:nth-child(n + 2) {
+  font-family: "IBM Plex Mono", monospace;
+}

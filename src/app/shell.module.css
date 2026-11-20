@@ -1,0 +1,93 @@
+.shell {
+  min-height: 100%;
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
+
+.mast {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 20px;
+  background: var(--tide-deep);
+  color: var(--cream);
+}
+
+.brand {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-decoration: none;
+}
+
+.wordmark {
+  font-family: Fraunces, serif;
+  font-size: 28px;
+  font-weight: 560;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.eyebrow {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.72;
+}
+
+.nav {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.nav a {
+  text-decoration: none;
+  padding: 8px 12px;
+  border-radius: 999px;
+  color: var(--cream);
+}
+
+.nav a[aria-current="page"] {
+  background: rgb(244 248 246 / 14%);
+}
+
+.account {
+  background: transparent;
+  border: 1px solid rgb(244 248 246 / 28%);
+  color: var(--cream);
+  border-radius: 999px;
+  padding: 8px 12px;
+}
+
+.main {
+  min-height: 0;
+}
+
+.menu {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 6px;
+  min-width: 220px;
+  box-shadow: var(--shadow);
+}
+
+.menu button,
+.menu a {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  padding: 8px 10px;
+  text-decoration: none;
+}
+
+.menu button:hover,
+.menu a:hover {
+  background: var(--paper);
+}

@@ -1,0 +1,51 @@
+.screen {
+  min-height: 100%;
+  display: grid;
+  place-items: center;
+  padding: 32px 16px;
+}
+
+.card {
+  width: min(560px, 100%);
+  background: var(--surface);
+  border-radius: 20px;
+  padding: 28px;
+  box-shadow: var(--shadow);
+}
+
+.wordmark {
+  font-family: Fraunces, serif;
+  font-size: 48px;
+  margin: 0;
+  letter-spacing: -0.04em;
+}
+
+.choices {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.choices button,
+.primary {
+  text-align: left;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: white;
+  padding: 14px;
+}
+
+.choices button strong {
+  display: block;
+}
+
+.choices button span {
+  color: var(--quiet);
+}
+
+.primary {
+  background: var(--tide);
+  color: white;
+  border: 0;
+  margin-top: 16px;
+}
