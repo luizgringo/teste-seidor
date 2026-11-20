@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "concurrently -n web,api -c cyan,green \"vite\" \"tsx watch server/index.ts\"",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && esbuild server/vercel.ts --bundle --platform=node --format=esm --outfile=api/index.mjs --packages=external",
     "preview": "vite preview",
     "lint": "biome check .",
     "format": "biome check --write .",
@@ -46,6 +46,7 @@
     "@vitejs/plugin-react": "^6.1.2",
     "@vitest/coverage-v8": "^5.1.1",
     "concurrently": "^10.0.7",
+    "esbuild": "^0.28.2",
     "husky": "^9.1.7",
     "jsdom": "^31.0.1",
     "tsx": "^4.23.15",

@@ -8,7 +8,7 @@
     "server": {
       "root": ".",
       "framework": "node",
-      "entrypoint": "server/vercel.ts"
+      "entrypoint": "api/index.mjs"
     }
   },
   "rewrites": [

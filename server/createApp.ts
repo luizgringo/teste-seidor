@@ -222,22 +222,21 @@ export function createApp(store: TicketStore) {
     return c.json({ ok: true })
   })
 
-  app.get(
-    '/ws',
-    upgradeWebSocket((c) => {
-      const session = readSession(c.req.header('cookie'), secret)
-      let current: LiveClient | null = null
-      return {
-        onOpen(_event, socket) {
-          current = { socket, personaId: session?.personaId ?? null }
-          clients.add(current)
-        },
-        onClose() {
-          if (current) clients.delete(current)
-        },
-      }
-    }),
-  )
+  const socketEvents = (c: { req: { header: (name: string) => string | undefined } }) => {
+    const session = readSession(c.req.header('cookie'), secret)
+    let current: LiveClient | null = null
+    return {
+      onOpen(_event: unknown, socket: WSContext) {
+        current = { socket, personaId: session?.personaId ?? null }
+        clients.add(current)
+      },
+      onClose() {
+        if (current) clients.delete(current)
+      },
+    }
+  }
+  app.get('/ws', upgradeWebSocket(socketEvents))
+  app.get('/api/ws', upgradeWebSocket(socketEvents))
 
   return app
 }

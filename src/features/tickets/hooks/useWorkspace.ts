@@ -24,7 +24,7 @@ export function useTicketStream(enabled: boolean) {
 
     const connect = () => {
       const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws'
-      socket = new WebSocket(`${protocol}://${window.location.host}/ws`)
+      socket = new WebSocket(`${protocol}://${window.location.host}/api/ws`)
       socket.onmessage = (message) => {
         const event = parseEvent(message.data)
         if (!event || seen.has(event.id)) return

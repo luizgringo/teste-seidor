@@ -119,6 +119,12 @@ pnpm test:e2e       # Playwright
 
 A jornada no navegador está em `tests/e2e/desk.spec.ts`. O critério do que entra na porcentagem está em [docs/development/testing.md](docs/development/testing.md).
 
+## Endereço público
+
+A demonstração está em https://teste-seidor-navy.vercel.app. A proteção de acesso da Vercel está desligada. O login da aplicação ainda depende de um OAuth App do GitHub: sem `GITHUB_CLIENT_ID` e `GITHUB_CLIENT_SECRET` no painel da Vercel, a tela abre e avisa que o GitHub não está configurado. O preview local não existe nesse endereço.
+
+Quando o OAuth App existir, a callback de produção é `https://teste-seidor-navy.vercel.app/auth/github/callback`.
+
 ## Onde ler o resto
 
 [docs/README.md](docs/README.md) aponta cada fluxo, a matriz de permissão e as decisões de arquitetura.

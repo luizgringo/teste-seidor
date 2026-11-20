@@ -16,6 +16,6 @@ Todas as rotas exigem o cookie, menos saúde, configuração e o início do logi
 - `POST /api/tickets/:ticketId/status`
 - `POST /api/tickets/:ticketId/take`
 - `POST /api/tickets/:ticketId/assign`
-- `GET /ws`
+- `GET /ws` e `GET /api/ws`
 
 Erro de validação responde 400. Ação fora do papel responde 403. Ticket ausente responde 404.
