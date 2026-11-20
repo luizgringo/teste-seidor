@@ -1,0 +1,8 @@
+#!/bin/sh
+message=$(cat "$1")
+printf "%s\n" "$message" | grep -Eq "^(feat|fix|docs|style|refactor|test|chore|perf)(\([a-z0-9-]+\))?: .+"
+status=$?
+if [ "$status" -ne 0 ]; then
+  echo "Use a Conventional Commit message."
+  exit 1
+fi
