@@ -1,3 +1,4 @@
+import { motion } from 'motion/react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 import type { DueTone } from '@/features/tickets/domain/sla.ts'
@@ -5,6 +6,9 @@ import { dueState } from '@/features/tickets/domain/sla.ts'
 import type { User, WireTicket } from '@/features/tickets/domain/types.ts'
 import { formatDue } from '@/shared/i18n/format.ts'
 import styles from './desk.module.css'
+
+/** Link da fila com deslocamento curto no hover e no clique. */
+const MotionLink = motion.create(Link)
 
 /** Propriedades da lista de chamados. */
 type TicketListProps = {
@@ -49,10 +53,12 @@ export function TicketList({ sections, users, selectedId, nowMs, showClock }: Ti
                   t('common.unassigned')
                 return (
                   <li key={ticket.id}>
-                    <Link
+                    <MotionLink
                       className={styles.row}
                       to={`/tickets/${ticket.id}`}
                       aria-current={ticket.id === selectedId ? 'true' : undefined}
+                      whileHover={{ x: 3 }}
+                      whileTap={{ scale: 0.985 }}
                     >
                       <span className={`${styles.rail} ${railClass(tone)}`} />
                       <span>
@@ -69,7 +75,7 @@ export function TicketList({ sections, users, selectedId, nowMs, showClock }: Ti
                           )}
                         </span>
                       </span>
-                    </Link>
+                    </MotionLink>
                   </li>
                 )
               })}

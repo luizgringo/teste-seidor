@@ -1,4 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
+import { motion } from 'motion/react'
 import { useTranslation } from 'react-i18next'
 import { Navigate, useNavigate } from 'react-router'
 import { PERSONA } from '@/features/auth/personas.ts'
@@ -53,14 +54,16 @@ export function SessionPage() {
         <h1>{t('session.title')}</h1>
         <div className={styles.choices}>
           {choices.map((choice) => (
-            <button
+            <motion.button
               key={choice.id}
               type="button"
+              whileHover={{ y: -2 }}
+              whileTap={{ scale: 0.985 }}
               onClick={() => void choose(choice.id, choice.role)}
             >
               <strong>{choice.name}</strong>
               <span>{choice.detail}</span>
-            </button>
+            </motion.button>
           ))}
         </div>
       </section>

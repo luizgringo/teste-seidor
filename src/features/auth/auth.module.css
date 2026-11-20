@@ -42,6 +42,15 @@
   border: 1px solid var(--line);
   background: white;
   padding: 14px;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background-color 160ms ease;
+}
+
+.choices button:hover,
+.primary:hover {
+  border-color: var(--tide);
 }
 
 .choices button strong {

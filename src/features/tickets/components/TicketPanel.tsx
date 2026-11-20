@@ -1,5 +1,6 @@
 import * as Dialog from '@radix-ui/react-dialog'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { AnimatePresence, motion } from 'motion/react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { capabilitiesFor } from '@/features/tickets/domain/access.ts'
@@ -35,75 +36,91 @@ export function TicketPanel({ ticket, workspace, nowMs }: TicketPanelProps) {
   const name = (id: string | null) =>
     workspace.users.find((user) => user.id === id)?.name ?? t('common.unassigned')
   return (
-    <div className={styles.detail}>
-      <section className={styles.conversation} aria-label={t('ticket.conversation')}>
-        <header>
-          <p className={styles.number}>{ticket.number}</p>
-          <h1>{ticket.title}</h1>
-          <p>{t(`status.${ticket.status}`)}</p>
-        </header>
-        <div className={styles.thread}>
-          <article className={styles.bubble}>
-            <strong>{name(ticket.requesterId)}</strong>
-            <p>{ticket.description}</p>
-          </article>
-          {timeline.map((entry) =>
-            entry.kind === 'message' ? (
-              <article
-                key={entry.message.id}
-                className={entry.message.visibility === 'internal' ? styles.note : styles.bubble}
-              >
-                <strong>
-                  {name(entry.message.authorId)}
-                  {entry.message.visibility === 'internal' ? ` · ${t('ticket.internalNote')}` : ''}
-                </strong>
-                <p>{entry.message.body}</p>
-              </article>
-            ) : (
-              <p key={entry.change.id}>
-                {t('ticket.statusChanged', {
-                  status: t(`status.${entry.change.to}`),
-                  reason: entry.change.reason,
-                })}
-              </p>
-            ),
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={ticket.id}
+        className={styles.detail}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -6 }}
+      >
+        <section className={styles.conversation} aria-label={t('ticket.conversation')}>
+          <header>
+            <p className={styles.number}>{ticket.number}</p>
+            <h1>{ticket.title}</h1>
+            <p>{t(`status.${ticket.status}`)}</p>
+          </header>
+          <div className={styles.thread}>
+            <motion.article
+              className={styles.bubble}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              <strong>{name(ticket.requesterId)}</strong>
+              <p>{ticket.description}</p>
+            </motion.article>
+            {timeline.map((entry) =>
+              entry.kind === 'message' ? (
+                <motion.article
+                  key={entry.message.id}
+                  className={entry.message.visibility === 'internal' ? styles.note : styles.bubble}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  <strong>
+                    {name(entry.message.authorId)}
+                    {entry.message.visibility === 'internal'
+                      ? ` · ${t('ticket.internalNote')}`
+                      : ''}
+                  </strong>
+                  <p>{entry.message.body}</p>
+                </motion.article>
+              ) : (
+                <p key={entry.change.id}>
+                  {t('ticket.statusChanged', {
+                    status: t(`status.${entry.change.to}`),
+                    reason: entry.change.reason,
+                  })}
+                </p>
+              ),
+            )}
+          </div>
+          {capabilities.canReply || capabilities.canCreateInternalNote ? (
+            <Composer ticketId={ticket.id} allowInternal={capabilities.canCreateInternalNote} />
+          ) : (
+            <p className={styles.empty}>{t('ticket.closedHint')}</p>
           )}
-        </div>
-        {capabilities.canReply || capabilities.canCreateInternalNote ? (
-          <Composer ticketId={ticket.id} allowInternal={capabilities.canCreateInternalNote} />
-        ) : (
-          <p className={styles.empty}>{t('ticket.closedHint')}</p>
-        )}
-      </section>
-      <aside className={styles.context} aria-label={t('ticket.details')}>
-        <dl>
-          <dt>{t('ticket.due')}</dt>
-          <dd>
-            {capabilities.canViewTaxonomy
-              ? formatDue(ticket.dueAt, nowMs, t)
-              : t(`status.${ticket.status}`)}
-          </dd>
-          <dt>{t('ticket.assignee')}</dt>
-          <dd>{name(ticket.assigneeId)}</dd>
-          {capabilities.canViewTaxonomy && ticket.priority ? (
-            <>
-              <dt>{t('ticket.priority')}</dt>
-              <dd>{t(`priority.${ticket.priority}`)}</dd>
-            </>
-          ) : null}
-        </dl>
-        <div className={styles.actions}>
-          {capabilities.canTake ? <TakeButton ticketId={ticket.id} /> : null}
-          {capabilities.canChangeStatus ? (
-            <StatusDialog ticket={ticket} viewer={workspace.viewer} />
-          ) : null}
-          {capabilities.canReopen ? <ReopenButton ticketId={ticket.id} /> : null}
-          {capabilities.canReassign ? (
-            <Reassign ticketId={ticket.id} users={workspace.users} />
-          ) : null}
-        </div>
-      </aside>
-    </div>
+        </section>
+        <aside className={styles.context} aria-label={t('ticket.details')}>
+          <dl>
+            <dt>{t('ticket.due')}</dt>
+            <dd>
+              {capabilities.canViewTaxonomy
+                ? formatDue(ticket.dueAt, nowMs, t)
+                : t(`status.${ticket.status}`)}
+            </dd>
+            <dt>{t('ticket.assignee')}</dt>
+            <dd>{name(ticket.assigneeId)}</dd>
+            {capabilities.canViewTaxonomy && ticket.priority ? (
+              <>
+                <dt>{t('ticket.priority')}</dt>
+                <dd>{t(`priority.${ticket.priority}`)}</dd>
+              </>
+            ) : null}
+          </dl>
+          <div className={styles.actions}>
+            {capabilities.canTake ? <TakeButton ticketId={ticket.id} /> : null}
+            {capabilities.canChangeStatus ? (
+              <StatusDialog ticket={ticket} viewer={workspace.viewer} />
+            ) : null}
+            {capabilities.canReopen ? <ReopenButton ticketId={ticket.id} /> : null}
+            {capabilities.canReassign ? (
+              <Reassign ticketId={ticket.id} users={workspace.users} />
+            ) : null}
+          </div>
+        </aside>
+      </motion.div>
+    </AnimatePresence>
   )
 }
 

@@ -1,10 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
+import { motion } from 'motion/react'
 import { useTranslation } from 'react-i18next'
 import type { ConsultantLoad } from '@/features/tickets/domain/types.ts'
 import { ApiError, api } from '@/shared/api/http.ts'
 import styles from './team.module.css'
 
-/** Ricardo's morning view: who is overloaded, who is idle, who is about to breach. */
+/** Manhã do Ricardo: quem está carregado, quem está ocioso e quem está em risco. */
 export function TeamPage() {
   /** Valor valor. */
   const { t } = useTranslation()
@@ -32,13 +33,18 @@ export function TeamPage() {
           </tr>
         </thead>
         <tbody>
-          {team.data.consultants.map((row) => (
-            <tr key={row.consultantId}>
+          {team.data.consultants.map((row, index) => (
+            <motion.tr
+              key={row.consultantId}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: Math.min(index, 8) * 0.03 }}
+            >
               <td>{row.name}</td>
               <td>{row.openCount}</td>
               <td>{row.atRiskCount}</td>
               <td>{formatIdle(row.idleMinutes)}</td>
-            </tr>
+            </motion.tr>
           ))}
         </tbody>
       </table>

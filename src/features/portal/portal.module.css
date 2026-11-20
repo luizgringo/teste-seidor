@@ -4,6 +4,15 @@
   padding: 28px 20px 64px;
 }
 
+.portal h1 {
+  font-family: Fraunces, serif;
+  font-size: 36px;
+  font-weight: 560;
+  letter-spacing: -0.03em;
+  line-height: 1.12;
+  margin: 0 0 8px;
+}
+
 .card {
   display: block;
   text-decoration: none;

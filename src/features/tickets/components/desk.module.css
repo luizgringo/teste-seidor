@@ -55,7 +55,8 @@
   border: 0;
   background: transparent;
   border-radius: 12px;
-  padding: 10px 8px;
+  padding: 12px 10px;
+  transition: background-color 160ms ease;
 }
 
 .row[aria-current="true"],
@@ -83,8 +84,18 @@
 }
 
 .title {
-  margin: 2px 0;
+  margin: 4px 0;
   font-size: 15px;
+  line-height: 1.35;
+}
+
+.conversation h1 {
+  font-family: Fraunces, serif;
+  font-size: 32px;
+  font-weight: 560;
+  letter-spacing: -0.03em;
+  line-height: 1.12;
+  margin: 4px 0 8px;
 }
 
 .meta {
@@ -195,6 +206,19 @@
 .quiet {
   border-radius: 999px;
   padding: 8px 14px;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease;
+}
+
+.primary:hover {
+  background: #128892;
+}
+
+.primary:active,
+.quiet:active {
+  transform: scale(0.98);
 }
 
 .primary {
@@ -216,6 +240,7 @@
   position: fixed;
   inset: 0;
   background: rgb(8 54 59 / 35%);
+  animation: desk-fade 160ms ease;
 }
 
 .dialog {
@@ -228,6 +253,16 @@
   border-radius: 16px;
   padding: 20px;
   box-shadow: var(--shadow);
+  animation: desk-fade 180ms ease;
+}
+
+@keyframes desk-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .dialog textarea,
@@ -242,6 +277,17 @@
 .error {
   color: var(--breach);
   margin: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dialog,
+  .dialogOverlay,
+  .primary,
+  .quiet,
+  .row {
+    animation: none;
+    transition: none;
+  }
 }
 
 @media (max-width: 960px) {

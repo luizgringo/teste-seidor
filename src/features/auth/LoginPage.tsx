@@ -1,4 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
+import { motion } from 'motion/react'
 import { useTranslation } from 'react-i18next'
 import { Navigate, useNavigate } from 'react-router'
 import { useDeskConfig, useSession } from '@/features/auth/useSession.ts'
@@ -35,7 +36,11 @@ export function LoginPage() {
 
   return (
     <div className={styles.screen}>
-      <section className={styles.card}>
+      <motion.section
+        className={styles.card}
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
         <LanguageSelect className={styles.language} />
         <p>{t('brand.eyebrow')}</p>
         <h1 className={styles.wordmark}>Northline</h1>
@@ -52,7 +57,7 @@ export function LoginPage() {
             {t('login.preview')}
           </button>
         ) : null}
-      </section>
+      </motion.section>
     </div>
   )
 }

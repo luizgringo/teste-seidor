@@ -1,9 +1,13 @@
+import { motion } from 'motion/react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 import { useTicketStream, useWorkspace } from '@/features/tickets/hooks/useWorkspace.ts'
 import styles from './portal.module.css'
 
-/** Helena's list: her tickets, in plain language, newest activity first. */
+/** Cartão do pedido com leve elevação no hover. */
+const MotionCard = motion.create(Link)
+
+/** Lista da Helena: os pedidos dela, do mais recente para o mais antigo. */
 export function PortalPage() {
   /** Valor valor. */
   const { t } = useTranslation()
@@ -22,10 +26,16 @@ export function PortalPage() {
       <p>{t('portal.intro')}</p>
       {tickets.length === 0 ? <p>{t('portal.empty')}</p> : null}
       {tickets.map((ticket) => (
-        <Link key={ticket.id} className={styles.card} to={`/tickets/${ticket.id}`}>
+        <MotionCard
+          key={ticket.id}
+          className={styles.card}
+          to={`/tickets/${ticket.id}`}
+          whileHover={{ y: -2 }}
+          whileTap={{ scale: 0.99 }}
+        >
           <strong>{ticket.title}</strong>
           <span>{t(`status.${ticket.status}`)}</span>
-        </Link>
+        </MotionCard>
       ))}
     </div>
   )
