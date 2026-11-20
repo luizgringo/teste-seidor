@@ -1,0 +1,17 @@
+---
+description: Who can see and change a ticket
+globs: "{src/features/**,server/**}"
+alwaysApply: false
+---
+
+# ITSM permissions
+
+Customers read and write only their own tickets, and only public text. They may reopen `closed` tickets.
+
+Consultants work inside their group. They can take an unassigned ticket, reply, write internal notes, and change status with a reason.
+
+Managers see every group, reassign tickets, and open the team board.
+
+Filter hidden fields in `presentWorkspace` before the JSON is sent. A customer payload has `priority: null`, `groupId: null`, and no internal message.
+
+Events use English names: `ticket.opened`, `ticket.assigned`, `message.added`, `status.changed`. Ignore a repeated event `id`.

@@ -1,0 +1,13 @@
+---
+description: CSS Modules without Tailwind utilities
+globs: "**/*.{tsx,css}"
+alwaysApply: false
+---
+
+# CSS Modules
+
+Style components with CSS Modules. Use block, element, and modifier names such as `ticket-list`, `ticket-list__due`, and `ticket-list--breached`.
+
+Do not add Tailwind utility classes to `className` or `class`.
+
+Keep tokens in `src/styles/globals.css`. Do not invent a second palette in a component.

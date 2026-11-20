@@ -1,0 +1,13 @@
+---
+description: TSDoc only on exports
+globs: "**/*.{ts,tsx}"
+alwaysApply: false
+---
+
+# TSDoc
+
+Document exported functions, components, hooks, types, and domain rules with a short TSDoc block.
+
+Do not document local variables, obvious parameters, or line-by-line behavior.
+
+When a rule has a known ceiling, name the ceiling and the upgrade in that TSDoc. `dueState` is the example: clock hours now, business calendar later.

@@ -1,0 +1,20 @@
+---
+description: Feature boundaries, state, and review limits for this ITSM console
+alwaysApply: true
+---
+
+# React engineering
+
+Organize by feature. `shared` does not import features. A feature does not import another feature's internals. Routes in `src/app` compose pages.
+
+Keep ticket rules in `src/features/tickets/domain`. That folder does not import React. Components receive capabilities. They do not re-decide the role.
+
+State: draft in `useState`, filters in the URL, server data in TanStack Query, session in an HttpOnly cookie. Do not add Zustand, Redux, or a second cache for socket events.
+
+TypeScript stays `strict`. Exported symbols get TSDoc. Local variables do not.
+
+CSS Modules only. Do not put Tailwind utilities in `className`.
+
+Biome is the formatter and linter. Do not add ESLint or Prettier.
+
+Review file size against the bands in `docs/engineering/REACT_ENGINEERING_STANDARDS.md` section 10. Do not split a file only to hit a number.
