@@ -36,6 +36,13 @@ export const en: Messages = {
     active: 'on',
     cancel: 'Cancel',
   },
+  notFound: {
+    code: '404',
+    title: 'This address does not exist',
+    body: 'That path does not lead to a screen on the desk.',
+    home: 'Back to the desk',
+    login: 'Go to sign in',
+  },
   queue: {
     loading: 'Loading the queue…',
     error: 'The queue could not be loaded.',

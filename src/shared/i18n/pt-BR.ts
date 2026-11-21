@@ -41,6 +41,13 @@ export const ptBR = {
     active: 'ativo',
     cancel: 'Cancelar',
   },
+  notFound: {
+    code: '404',
+    title: 'Esse endereço não existe',
+    body: 'O caminho não leva a nenhuma tela da mesa.',
+    home: 'Voltar para a mesa',
+    login: 'Ir para o login',
+  },
   queue: {
     loading: 'Carregando a fila…',
     error: 'A fila não pôde ser carregada.',

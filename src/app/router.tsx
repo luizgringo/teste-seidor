@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router'
+import { NotFoundPage } from '@/app/NotFoundPage.tsx'
 import { Shell } from '@/app/Shell.tsx'
 import { LoginPage } from '@/features/auth/LoginPage.tsx'
 import { SessionPage } from '@/features/auth/SessionPage.tsx'
@@ -26,6 +27,7 @@ export function AppRouter() {
           <Route path="/tickets/:ticketId" element={<TicketSwitch />} />
           <Route path="/team" element={<TeamPage />} />
         </Route>
+        <Route path="*" element={<NotFoundRoute />} />
       </Routes>
     </BrowserRouter>
   )
@@ -62,6 +64,29 @@ function QueueSwitch() {
   const session = useSession()
   if (session.data?.persona?.role === 'customer') return <PortalPage />
   return <QueuePage />
+}
+
+/** Executa NotFoundRoute. */
+function NotFoundRoute() {
+  /** Valor valor. */
+  const { t } = useTranslation()
+  /** Valor session. */
+  const session = useSession()
+  if (session.isLoading) return <p>{t('common.loadingDesk')}</p>
+  if (!session.data) return <NotFoundPage homeTo="/login" homeLabel={t('notFound.login')} />
+  if (!session.data.persona) {
+    return <NotFoundPage homeTo="/session" homeLabel={t('notFound.login')} />
+  }
+  /** Valor role. */
+  const role = session.data.persona.role
+  return (
+    <Shell>
+      <NotFoundPage
+        homeTo={role === 'manager' ? '/team' : '/queue'}
+        homeLabel={t('notFound.home')}
+      />
+    </Shell>
+  )
 }
 
 /** Executa TicketSwitch. */

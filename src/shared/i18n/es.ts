@@ -36,6 +36,13 @@ export const es: Messages = {
     active: 'activo',
     cancel: 'Cancelar',
   },
+  notFound: {
+    code: '404',
+    title: 'Esta dirección no existe',
+    body: 'Ese camino no lleva a ninguna pantalla de la mesa.',
+    home: 'Volver a la mesa',
+    login: 'Ir al inicio de sesión',
+  },
   queue: {
     loading: 'Cargando la cola…',
     error: 'No se pudo cargar la cola.',
