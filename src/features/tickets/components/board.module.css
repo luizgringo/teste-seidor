@@ -1,0 +1,158 @@
+.board {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 20px 16px;
+}
+
+.board h1 {
+  margin: 0 0 4px;
+  font-family: Fraunces, serif;
+  font-size: 32px;
+  font-weight: 560;
+  letter-spacing: -0.03em;
+}
+
+.intro {
+  margin: 0 0 16px;
+  color: var(--quiet);
+}
+
+.columns {
+  display: flex;
+  gap: 12px;
+  min-height: 0;
+  flex: 1;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+.column {
+  flex: 0 0 280px;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+}
+
+.column header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px 12px 8px;
+}
+
+.column h2 {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+.count {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 12px;
+  color: var(--quiet);
+}
+
+.cards {
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 8px 8px;
+}
+
+.card {
+  display: grid;
+  grid-template-columns: 4px 1fr;
+  gap: 10px;
+  text-decoration: none;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px;
+  transition:
+    transform 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 180ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.card:hover {
+  border-color: var(--accent-9, var(--tide));
+  transform: translateY(-2px);
+}
+
+.cardBreached,
+.cardBreached:hover {
+  background: var(--breach-soft);
+  border-color: var(--breach);
+}
+
+.rail {
+  border-radius: 999px;
+}
+
+.railBreached {
+  background: var(--breach);
+}
+
+.railSoon {
+  background: var(--amber);
+}
+
+.railOk {
+  background: var(--ok);
+}
+
+.railQuiet {
+  background: var(--line);
+}
+
+.number {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 12px;
+  color: var(--quiet);
+}
+
+.card strong {
+  display: block;
+  margin: 4px 0;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--quiet);
+  font-size: 12px;
+}
+
+.who {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.clock {
+  font-family: "IBM Plex Mono", monospace;
+  flex-shrink: 0;
+}
+
+.clockBreached {
+  color: var(--breach);
+  font-weight: 600;
+}
+
+.clockSoon {
+  color: var(--amber);
+}
+
+.empty {
+  margin: 4px 8px 12px;
+  color: var(--quiet);
+  font-size: 13px;
+}

@@ -7,7 +7,9 @@ import {
   addMessage,
   assignTicket,
   changeStatus,
+  editMessage,
   openTicket,
+  removeMessage,
   takeTicket,
 } from '../src/features/tickets/domain/commands.ts'
 import { presentEvent, presentWorkspace } from '../src/features/tickets/domain/present.ts'
@@ -15,6 +17,7 @@ import { teamLoad } from '../src/features/tickets/domain/team.ts'
 import type { AppState, DomainEvent, User } from '../src/features/tickets/domain/types.ts'
 import {
   assignSchema,
+  messageEditSchema,
   messageSchema,
   openTicketSchema,
   personaSchema,
@@ -215,6 +218,46 @@ export function createApp(store: TicketStore) {
     )
     if (failure) return c.json({ message: failure.message }, failure.status)
     return c.json({ ok: true }, 201)
+  })
+
+  app.patch('/api/tickets/:ticketId/messages/:messageId', async (c) => {
+    /** Valor actor. */
+    const actor = await requireActor(c, store, secret)
+    if (actor instanceof Response) return actor
+    /** Valor body. */
+    const body = parsed(messageEditSchema, await c.req.json().catch(() => null))
+    if (!body.ok) return c.json({ message: body.message }, 400)
+    /** Valor failure. */
+    const failure = await commitCommand(store, (state) =>
+      editMessage(
+        state,
+        actor,
+        c.req.param('ticketId'),
+        c.req.param('messageId'),
+        body.data,
+        commandContext(),
+      ),
+    )
+    if (failure) return c.json({ message: failure.message }, failure.status)
+    return c.json({ ok: true })
+  })
+
+  app.delete('/api/tickets/:ticketId/messages/:messageId', async (c) => {
+    /** Valor actor. */
+    const actor = await requireActor(c, store, secret)
+    if (actor instanceof Response) return actor
+    /** Valor failure. */
+    const failure = await commitCommand(store, (state) =>
+      removeMessage(
+        state,
+        actor,
+        c.req.param('ticketId'),
+        c.req.param('messageId'),
+        commandContext(),
+      ),
+    )
+    if (failure) return c.json({ message: failure.message }, failure.status)
+    return c.json({ ok: true })
   })
 
   app.post('/api/tickets/:ticketId/status', async (c) => {

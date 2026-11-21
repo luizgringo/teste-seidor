@@ -4,6 +4,6 @@ TypeScript `strict`, com `noUncheckedIndexedAccess`. Toda função, tipo, hook, 
 
 A interface usa i18next. O padrão é português do Brasil, com inglês e espanhol no seletor.
 
-CSS Modules, com nomes de bloco, elemento e modificador. Sem utilitário Tailwind no `className`.
+CSS Modules, com nomes de bloco, elemento e modificador, no layout da mesa. Botão, campo, diálogo e menu vêm do Radix Themes. Sem utilitário Tailwind no `className`.
 
 A regra de negócio nova entra em `domain` e ganha um teste que falha se a regra quebrar. Componente só desenha o que a capacidade já calculou.

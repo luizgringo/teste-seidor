@@ -20,26 +20,36 @@ export const GROUP = {
 } as const
 
 /** Chamado que o teste da fila procura porque está perto de estourar. */
-export const PAYROLL_TITLE = 'Payroll export fails before the cutoff'
+export const PAYROLL_TITLE = 'A exportação da folha falha antes do fechamento'
 
-/** Unassigned ticket Marina can take. */
-export const PRINTER_TITLE = 'Printer on floor 3 is offline'
+/** Chamado sem responsável que a Marina pode assumir. */
+export const PRINTER_TITLE = 'A impressora do 3º andar está offline'
 
-/** Helena's open request. */
-export const HELENA_OPEN_TITLE = 'VPN from Lisbon fails'
+/** Pedido aberto da Helena. */
+export const HELENA_OPEN_TITLE = 'A VPN de Lisboa falha'
 
 /** Pedido fechado que deve ser sugerido quando Helena descreve o mesmo problema. */
-export const HELENA_CLOSED_TITLE = 'VPN from Lisbon fails when the office network changes'
+export const HELENA_CLOSED_TITLE = 'A VPN de Lisboa falha quando a rede do escritório muda'
 
 /** Valor SYSTEMS. */
-const SYSTEMS = ['VPN', 'Email', 'ERP', 'Payroll', 'Printer', 'Badge', 'Laptop', 'SSO', 'Scanner']
+const SYSTEMS = [
+  'VPN',
+  'E-mail',
+  'ERP',
+  'Folha de pagamento',
+  'Impressora',
+  'Crachá',
+  'Notebook',
+  'SSO',
+  'Scanner',
+]
 /** Valor PROBLEMS. */
 const PROBLEMS = [
-  'times out after login',
-  'shows the wrong total',
-  'stops halfway through',
-  'asks for a password twice',
-  'drops the connection',
+  'expira depois do login',
+  'mostra o total errado',
+  'para no meio do processo',
+  'pede a senha duas vezes',
+  'perde a conexão',
 ]
 
 /**
@@ -84,7 +94,7 @@ export function buildState(nowMs: number, seedVersion: string): AppState {
         ticketId: ticket.id,
         from: 'open',
         to: ticket.status,
-        reason: ticket.status === 'closed' ? 'Work completed.' : 'Ticket taken',
+        reason: ticket.status === 'closed' ? 'Atendimento concluído.' : 'Chamado assumido.',
         userId: ticket.assigneeId ?? PERSONA.ricardo,
         occurredAt: ticket.updatedAt,
       })
@@ -94,7 +104,7 @@ export function buildState(nowMs: number, seedVersion: string): AppState {
       ticketId: ticket.id,
       authorId: ticket.requesterId,
       visibility: 'public',
-      body: 'This started during the morning and it is still happening.',
+      body: 'Isso começou de manhã e ainda está acontecendo.',
       createdAt: ticket.openedAt,
     })
     if (note && ticket.assigneeId) {
@@ -114,7 +124,7 @@ export function buildState(nowMs: number, seedVersion: string): AppState {
       id: '33333333-3333-4333-8333-000000000010',
       number: 'TCK-10420',
       title: PAYROLL_TITLE,
-      description: 'The Friday payroll file stops halfway through the export.',
+      description: 'O arquivo da folha de sexta para no meio da exportação.',
       status: 'in_progress',
       priority: 'high',
       groupId: GROUP.applications,
@@ -124,7 +134,7 @@ export function buildState(nowMs: number, seedVersion: string): AppState {
       dueAt: at(25),
       updatedAt: at(-20),
     }),
-    'Export job retries twice and then dies. Do not promise a time yet.',
+    'A exportação tenta duas vezes e depois falha. Não prometa um horário ainda.',
   )
 
   push(
@@ -132,7 +142,7 @@ export function buildState(nowMs: number, seedVersion: string): AppState {
       id: '33333333-3333-4333-8333-000000000011',
       number: 'TCK-10421',
       title: PRINTER_TITLE,
-      description: 'The floor 3 printer accepts the job and prints nothing.',
+      description: 'A impressora do 3º andar aceita o trabalho e não imprime nada.',
       status: 'open',
       priority: 'medium',
       groupId: GROUP.applications,
@@ -149,7 +159,7 @@ export function buildState(nowMs: number, seedVersion: string): AppState {
       id: '33333333-3333-4333-8333-000000000012',
       number: 'TCK-10422',
       title: HELENA_OPEN_TITLE,
-      description: 'VPN from Lisbon fails after the laptop wakes up.',
+      description: 'A VPN de Lisboa falha depois que o notebook sai da suspensão.',
       status: 'in_progress',
       priority: 'high',
       groupId: GROUP.applications,
@@ -159,7 +169,7 @@ export function buildState(nowMs: number, seedVersion: string): AppState {
       dueAt: at(300),
       updatedAt: at(-15),
     }),
-    'Lisbon gateway is flapping. Do not mention the maintenance window.',
+    'O gateway de Lisboa está instável. Não mencione a janela de manutenção.',
   )
 
   push(
@@ -167,7 +177,7 @@ export function buildState(nowMs: number, seedVersion: string): AppState {
       id: '33333333-3333-4333-8333-000000000013',
       number: 'TCK-10310',
       title: HELENA_CLOSED_TITLE,
-      description: 'VPN from Lisbon fails when the office network changes.',
+      description: 'A VPN de Lisboa falha quando a rede do escritório muda.',
       status: 'closed',
       priority: 'medium',
       groupId: GROUP.applications,
@@ -214,7 +224,7 @@ export function buildState(nowMs: number, seedVersion: string): AppState {
         id: `33333333-3333-4333-8333-${String(100 + index).padStart(12, '0')}`,
         number: `TCK-${10500 + index}`,
         title: `${SYSTEMS[index % SYSTEMS.length]} ${PROBLEMS[index % PROBLEMS.length]}`,
-        description: `Reported by the team. Case ${index + 1} keeps failing in the same step.`,
+        description: `Reportado pela equipe. O caso ${index + 1} continua falhando no mesmo passo.`,
         status,
         priority: priorityFor(index),
         groupId: groupId ?? GROUP.serviceDesk,
@@ -224,7 +234,7 @@ export function buildState(nowMs: number, seedVersion: string): AppState {
         dueAt,
         updatedAt: at(-30 - index),
       }),
-      index % 4 === 0 ? 'Internal check done. Waiting on the vendor log.' : undefined,
+      index % 4 === 0 ? 'Verificação interna feita. Aguardando o log do fornecedor.' : undefined,
     )
   }
 

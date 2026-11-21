@@ -1,5 +1,5 @@
 import { canMoveStatus, isDone } from './status.ts'
-import type { Capabilities, TicketStatus, User } from './types.ts'
+import type { Capabilities, MessageVisibility, TicketStatus, User } from './types.ts'
 
 /** Campos de que a permissão precisa. O que está oculto pode já vir nulo. */
 export type AccessibleTicket = {
@@ -47,6 +47,34 @@ export function capabilitiesFor(actor: User, ticket: AccessibleTicket | null): C
       ticket !== null &&
       ticket.status === 'closed' &&
       canMoveStatus('closed', 'open', actor.role),
+  }
+}
+
+/**
+ * Diz se esta pessoa pode alterar a própria mensagem.
+ * @param actor - Pessoa que está olhando.
+ * @param ticket - Chamado em que a mensagem está.
+ * @param message - Mensagem com autor e visibilidade.
+ * @returns Verdadeiro só para o autor, e só enquanto ainda pode escrever esse tipo de texto.
+ */
+export function canReviseMessage(
+  actor: User,
+  ticket: AccessibleTicket,
+  message: { authorId: string; visibility: MessageVisibility },
+): boolean {
+  if (message.authorId !== actor.id) return false
+  /** Valor capabilities. */
+  const capabilities = capabilitiesFor(actor, ticket)
+  switch (message.visibility) {
+    case 'internal':
+      return capabilities.canCreateInternalNote
+    case 'public':
+      return capabilities.canReply
+    default: {
+      /** Valor unreachable. */
+      const unreachable: never = message.visibility
+      return unreachable
+    }
   }
 }
 

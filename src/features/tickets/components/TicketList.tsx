@@ -5,6 +5,7 @@ import type { DueTone } from '@/features/tickets/domain/sla.ts'
 import { dueState } from '@/features/tickets/domain/sla.ts'
 import type { User, WireTicket } from '@/features/tickets/domain/types.ts'
 import { formatDue } from '@/shared/i18n/format.ts'
+import { PersonName } from '@/shared/people/PersonName.tsx'
 import styles from './desk.module.css'
 
 /** Link da fila com deslocamento curto no hover e no clique. */
@@ -42,7 +43,10 @@ export function TicketList({ sections, users, selectedId, nowMs, showClock }: Ti
         const title = sectionTitle(section.id, t)
         return (
           <section key={section.id} className={styles.section} aria-label={title}>
-            <h2>{title}</h2>
+            <h2>
+              {title}
+              <span className={styles.count}>{section.tickets.length}</span>
+            </h2>
             <ul>
               {section.tickets.map((ticket) => {
                 /** Valor tone. */
@@ -54,25 +58,28 @@ export function TicketList({ sections, users, selectedId, nowMs, showClock }: Ti
                 return (
                   <li key={ticket.id}>
                     <MotionLink
-                      className={styles.row}
-                      to={`/tickets/${ticket.id}`}
+                      className={
+                        tone === 'breached' ? `${styles.row} ${styles.rowBreached}` : styles.row
+                      }
+                      to={`/tickets/${ticket.number}`}
                       aria-current={ticket.id === selectedId ? 'true' : undefined}
-                      whileHover={{ x: 3 }}
                       whileTap={{ scale: 0.985 }}
                     >
                       <span className={`${styles.rail} ${railClass(tone)}`} />
-                      <span>
-                        <span className={styles.number}>{ticket.number}</span>
-                        <p className={styles.title}>{ticket.title}</p>
-                        <span className={styles.meta}>
-                          <span>{assignee}</span>
+                      <span className={styles.copy}>
+                        <span className={styles.topline}>
+                          <span className={styles.number}>{ticket.number}</span>
                           {showClock ? (
                             <span className={`${styles.clock} ${clockClass(tone)}`}>
                               {formatDue(ticket.dueAt, nowMs, t)}
                             </span>
                           ) : (
-                            <span>{t(`status.${ticket.status}`)}</span>
+                            <span className={styles.clock}>{t(`status.${ticket.status}`)}</span>
                           )}
+                        </span>
+                        <p className={styles.title}>{ticket.title}</p>
+                        <span className={styles.assignee}>
+                          <PersonName userId={ticket.assigneeId} name={assignee} />
                         </span>
                       </span>
                     </MotionLink>

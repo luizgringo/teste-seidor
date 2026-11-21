@@ -15,6 +15,10 @@ export function applyEvent(state: AppState, event: DomainEvent): AppState {
       return applyAssigned(state, event, seenEventIds)
     case 'message.added':
       return applyMessage(state, event.payload, event.occurredAt, seenEventIds)
+    case 'message.edited':
+      return applyEdited(state, event.payload, seenEventIds)
+    case 'message.removed':
+      return applyRemoved(state, event.payload.messageId, seenEventIds)
     case 'status.changed':
       return applyStatus(state, event, seenEventIds)
     default: {
@@ -76,6 +80,25 @@ function applyMessage(
     ticket.id === message.ticketId ? { ...ticket, updatedAt: occurredAt } : ticket,
   )
   return { ...state, seenEventIds, tickets, messages: [...state.messages, message] }
+}
+
+/** Executa applyEdited. */
+function applyEdited(state: AppState, message: Message, seenEventIds: string[]): AppState {
+  if (!state.messages.some((item) => item.id === message.id)) return { ...state, seenEventIds }
+  return {
+    ...state,
+    seenEventIds,
+    messages: state.messages.map((item) => (item.id === message.id ? message : item)),
+  }
+}
+
+/** Executa applyRemoved. */
+function applyRemoved(state: AppState, messageId: string, seenEventIds: string[]): AppState {
+  return {
+    ...state,
+    seenEventIds,
+    messages: state.messages.filter((item) => item.id !== messageId),
+  }
 }
 
 /** Executa applyStatus. */

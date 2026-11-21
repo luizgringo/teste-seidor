@@ -6,6 +6,7 @@ import { PERSONA } from '@/features/auth/personas.ts'
 import { useSession } from '@/features/auth/useSession.ts'
 import { api } from '@/shared/api/http.ts'
 import { LanguageSelect } from '@/shared/i18n/LanguageSelect.tsx'
+import { PersonName } from '@/shared/people/PersonName.tsx'
 import styles from './auth.module.css'
 
 /**
@@ -48,9 +49,22 @@ export function SessionPage() {
 
   return (
     <div className={styles.screen}>
-      <section className={styles.card}>
-        <LanguageSelect className={styles.language} />
-        <p>{t('session.signedIn', { name: session.data.githubName })}</p>
+      <motion.section
+        className={styles.card}
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        <div className={styles.cardHead}>
+          <p>
+            {t('session.signedIn', {
+              name:
+                session.data.githubLogin === 'local-preview'
+                  ? t('session.localName')
+                  : session.data.githubName,
+            })}
+          </p>
+          <LanguageSelect />
+        </div>
         <h1>{t('session.title')}</h1>
         <div className={styles.choices}>
           {choices.map((choice) => (
@@ -61,12 +75,14 @@ export function SessionPage() {
               whileTap={{ scale: 0.985 }}
               onClick={() => void choose(choice.id, choice.role)}
             >
-              <strong>{choice.name}</strong>
+              <strong>
+                <PersonName userId={choice.id} name={choice.name} />
+              </strong>
               <span>{choice.detail}</span>
             </motion.button>
           ))}
         </div>
-      </section>
+      </motion.section>
     </div>
   )
 }

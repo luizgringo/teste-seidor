@@ -1,10 +1,20 @@
 import { describe, expect, it } from 'vitest'
-import { addMessage, assignTicket, changeStatus, openTicket, takeTicket } from './commands.ts'
+import {
+  addMessage,
+  assignTicket,
+  changeStatus,
+  editMessage,
+  openTicket,
+  removeMessage,
+  takeTicket,
+} from './commands.ts'
+import { presentEvent } from './present.ts'
 import {
   context,
   diego,
   emptyState,
   helena,
+  internalNote,
   marina,
   payrollTicket,
   ricardo,
@@ -64,6 +74,45 @@ describe('ticket commands', () => {
       context(['event-b', 'message-b']),
     )
     expect(noted.ok).toBe(true)
+  })
+
+  it('lets Marina edit and delete her own note, and stops Ricardo', () => {
+    const edited = editMessage(
+      emptyState(),
+      marina,
+      payrollTicket.id,
+      'message-internal',
+      { body: 'Checked the file again.' },
+      context(['event-edit']),
+    )
+    expect(edited.ok).toBe(true)
+    if (!edited.ok) return
+    expect(edited.state.messages[0]?.body).toBe('Checked the file again.')
+    expect(edited.state.messages[0]?.editedAt).toBe('2026-11-20T12:00:00.000Z')
+    expect(edited.state.messages[0]?.createdAt).toBe(internalNote.createdAt)
+    const blocked = editMessage(
+      emptyState(),
+      ricardo,
+      payrollTicket.id,
+      'message-internal',
+      { body: 'Not mine.' },
+      context(['event-block']),
+    )
+    expect(blocked).toMatchObject({ ok: false, status: 403, message: 'errors.cannotRevise' })
+    const removed = removeMessage(
+      edited.state,
+      marina,
+      payrollTicket.id,
+      'message-internal',
+      context(['event-remove']),
+    )
+    expect(removed.ok).toBe(true)
+    if (!removed.ok) return
+    expect(removed.state.messages).toEqual([])
+    const removedEvent = removed.events[0]
+    expect(removedEvent).toBeDefined()
+    if (!removedEvent) return
+    expect(presentEvent(removedEvent, removed.state, helena)).toBeNull()
   })
 
   it('rejects a missing ticket and a reply on a closed one', () => {

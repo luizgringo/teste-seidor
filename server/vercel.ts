@@ -9,7 +9,7 @@ import { loadLocalEnv } from './env.ts'
 loadLocalEnv()
 
 /** Valor state. */
-const state = buildState(Date.now(), process.env.SEED_VERSION ?? '2026-11-20')
+const state = buildState(Date.now(), process.env.SEED_VERSION ?? '2026-11-20-pt')
 /** Valor store. */
 const store = redisConfigured() ? createRedisStore(state) : createMemoryStore(state)
 

@@ -3,9 +3,9 @@ import type { TicketStore } from './memoryStore.ts'
 
 /** Valor REPLIES. */
 const REPLIES = [
-  'Any update on this?',
-  'I tried again and the same error is still there.',
-  'This is blocking the team this afternoon.',
+  'Tem alguma atualização?',
+  'Tentei de novo e o mesmo erro continua.',
+  'Isso está travando a equipe esta tarde.',
 ]
 
 /** Emite uma resposta pública num chamado em atendimento, para a mesa se mover enquanto alguém lê. */
@@ -29,7 +29,7 @@ async function tick(store: TicketStore): Promise<void> {
     const requester = state.users.find((user) => user.id === ticket.requesterId)
     if (!requester) return { state, events: [] }
     /** Valor body. */
-    const body = REPLIES[Math.floor(Math.random() * REPLIES.length)] ?? 'Any update on this?'
+    const body = REPLIES[Math.floor(Math.random() * REPLIES.length)] ?? 'Tem alguma atualização?'
     /** Valor result. */
     const result = addMessage(
       state,

@@ -68,6 +68,7 @@ export type Message = {
   visibility: MessageVisibility
   body: string
   createdAt: string
+  editedAt?: string
 }
 
 /** Transição de status registrada. */
@@ -134,6 +135,26 @@ export type MessageAddedEvent = {
   payload: Message
 }
 
+/** O autor alterou o texto da própria mensagem. */
+export type MessageEditedEvent = {
+  id: string
+  type: 'message.edited'
+  occurredAt: string
+  payload: Message
+}
+
+/** O autor apagou a própria mensagem. */
+export type MessageRemovedEvent = {
+  id: string
+  type: 'message.removed'
+  occurredAt: string
+  payload: {
+    messageId: string
+    ticketId: string
+    visibility: MessageVisibility
+  }
+}
+
 /** Um chamado passou de um status para outro. */
 export type StatusChangedEvent = {
   id: string
@@ -153,6 +174,8 @@ export type DomainEvent =
   | TicketOpenedEvent
   | TicketAssignedEvent
   | MessageAddedEvent
+  | MessageEditedEvent
+  | MessageRemovedEvent
   | StatusChangedEvent
 
 /** Evento de abertura depois que os campos ocultos saem para quem olha. */
@@ -168,6 +191,8 @@ export type ClientEvent =
   | ClientTicketOpenedEvent
   | TicketAssignedEvent
   | MessageAddedEvent
+  | MessageEditedEvent
+  | MessageRemovedEvent
   | StatusChangedEvent
 
 /** Retrato em memória ou no Redis de um tenant. */

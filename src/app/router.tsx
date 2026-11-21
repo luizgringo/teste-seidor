@@ -8,6 +8,7 @@ import { CustomerTicketPage } from '@/features/portal/CustomerTicketPage.tsx'
 import { NewTicketPage } from '@/features/portal/NewTicketPage.tsx'
 import { PortalPage } from '@/features/portal/PortalPage.tsx'
 import { TeamPage } from '@/features/team/TeamPage.tsx'
+import { BoardPage } from '@/features/tickets/pages/BoardPage.tsx'
 import { QueuePage } from '@/features/tickets/pages/QueuePage.tsx'
 
 /** Rotas da mesa. A persona decide qual tela um caminho desenha. */
@@ -20,6 +21,7 @@ export function AppRouter() {
         <Route element={<RequirePersona />}>
           <Route path="/" element={<HomeSwitch />} />
           <Route path="/queue" element={<QueueSwitch />} />
+          <Route path="/board" element={<BoardPage />} />
           <Route path="/tickets/new" element={<NewTicketPage />} />
           <Route path="/tickets/:ticketId" element={<TicketSwitch />} />
           <Route path="/team" element={<TeamPage />} />

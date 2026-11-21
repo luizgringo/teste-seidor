@@ -18,4 +18,5 @@ O README da raiz sobe o projeto. Aqui está o que o sistema faz e por onde o có
 - [Eventos](api/events.md)
 - [Mock](data/mock-dataset.md)
 - [Motion](architecture/decisions/0006-motion.md)
+- [Radix Themes](architecture/decisions/0007-radix-themes.md)
 - [Padrão de engenharia](engineering/REACT_ENGINEERING_STANDARDS.md)

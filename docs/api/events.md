@@ -7,6 +7,8 @@ Todo evento tem `id`, `type`, `occurredAt` e `payload`. O mesmo `id` pode chegar
 | `chamado.aberto`      | `ticket.opened`                                                   |
 | `chamado.atribuido`   | `ticket.assigned` com `ticketId` e `consultantId`                 |
 | `mensagem.adicionada` | `message.added`                                                   |
+|                       | `message.edited` com a mensagem já alterada                       |
+|                       | `message.removed` com `messageId`, `ticketId` e `visibility`      |
 | `status.alterado`     | `status.changed` com `ticketId`, `from`, `to`, `reason`, `userId` |
 | `ocorrido_em`         | `occurredAt`                                                      |
 

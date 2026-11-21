@@ -1,8 +1,8 @@
-import { canAccess, capabilitiesFor } from './access.ts'
+import { canAccess, canReviseMessage, capabilitiesFor } from './access.ts'
 import { applyEvent } from './events.ts'
 import { SLA_MINUTES } from './sla.ts'
 import { canMoveStatus } from './status.ts'
-import type { AppState, DomainEvent, Priority, Ticket, User } from './types.ts'
+import type { AppState, DomainEvent, Message, Priority, Ticket, User } from './types.ts'
 
 /** Relógio e fábrica de ids vindos do servidor, para o teste continuar determinístico. */
 export type CommandContext = {
@@ -99,6 +99,79 @@ export function addMessage(
   return ok(applyEvent(state, event), [event])
 }
 
+/** Altera o texto de uma mensagem escrita pela própria pessoa. */
+export function editMessage(
+  state: AppState,
+  actor: User,
+  ticketId: string,
+  messageId: string,
+  input: { body: string },
+  context: CommandContext,
+): CommandResult {
+  /** Valor found. */
+  const found = findOwnMessage(state, actor, ticketId, messageId)
+  if (!found.ok) return found
+  /** Valor body. */
+  const body = input.body.trim()
+  if (body.length < 1) return fail(400, 'errors.emptyMessage')
+  if (body === found.message.body) return ok(state, [])
+  /** Valor message. */
+  const message = { ...found.message, body, editedAt: context.now }
+  /** Valor event. */
+  const event: DomainEvent = {
+    id: context.createId(),
+    type: 'message.edited',
+    occurredAt: context.now,
+    payload: message,
+  }
+  return ok(applyEvent(state, event), [event])
+}
+
+/** Apaga uma mensagem escrita pela própria pessoa. */
+export function removeMessage(
+  state: AppState,
+  actor: User,
+  ticketId: string,
+  messageId: string,
+  context: CommandContext,
+): CommandResult {
+  /** Valor found. */
+  const found = findOwnMessage(state, actor, ticketId, messageId)
+  if (!found.ok) return found
+  /** Valor event. */
+  const event: DomainEvent = {
+    id: context.createId(),
+    type: 'message.removed',
+    occurredAt: context.now,
+    payload: {
+      messageId,
+      ticketId,
+      visibility: found.message.visibility,
+    },
+  }
+  return ok(applyEvent(state, event), [event])
+}
+
+/** Executa findOwnMessage. */
+function findOwnMessage(
+  state: AppState,
+  actor: User,
+  ticketId: string,
+  messageId: string,
+): { ok: true; message: Message } | { ok: false; status: 400 | 403 | 404; message: string } {
+  /** Valor ticket. */
+  const ticket = state.tickets.find((item) => item.id === ticketId)
+  if (!ticket) return { ok: false, status: 404, message: 'errors.notFound' }
+  /** Valor message. */
+  const message = state.messages.find((item) => item.id === messageId)
+  if (!message || message.ticketId !== ticketId)
+    return { ok: false, status: 404, message: 'errors.notFound' }
+  if (!canReviseMessage(actor, ticket, message)) {
+    return { ok: false, status: 403, message: 'errors.cannotRevise' }
+  }
+  return { ok: true, message }
+}
+
 /** Move o chamado e guarda o motivo na linha do tempo. */
 export function changeStatus(
   state: AppState,
@@ -144,7 +217,7 @@ export function takeTicket(
   const ticket = state.tickets.find((item) => item.id === ticketId)
   if (!ticket) return fail(404, 'errors.notFound')
   if (!capabilitiesFor(actor, ticket).canTake) return fail(403, 'errors.cannotTake')
-  return assignTo(state, actor, ticket, actor.id, 'Ticket taken', context)
+  return assignTo(state, actor, ticket, actor.id, 'Chamado assumido.', context)
 }
 
 /** Passa o chamado para outro consultor. Só o gestor. */
@@ -167,7 +240,7 @@ export function assignTicket(
     return fail(400, 'errors.chooseConsultant')
   }
   if (ticket.assigneeId === consultantId) return ok(state, [])
-  return assignTo(state, actor, ticket, consultantId, 'Ticket reassigned', context)
+  return assignTo(state, actor, ticket, consultantId, 'Chamado redistribuído.', context)
 }
 
 /** Executa assignTo. */

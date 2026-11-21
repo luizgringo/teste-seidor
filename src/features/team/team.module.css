@@ -15,6 +15,13 @@
   text-align: left;
   padding: 12px;
   border-bottom: 1px solid var(--line);
+  color: var(--ink);
+}
+
+.page th {
+  color: var(--quiet);
+  font-size: 12px;
+  letter-spacing: 0.04em;
 }
 
 .page th:nth-child(n + 2),

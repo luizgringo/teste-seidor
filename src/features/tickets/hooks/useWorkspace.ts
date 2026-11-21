@@ -67,6 +67,8 @@ function parseEvent(raw: unknown): ClientEvent | null {
       value.type === 'ticket.opened' ||
       value.type === 'ticket.assigned' ||
       value.type === 'message.added' ||
+      value.type === 'message.edited' ||
+      value.type === 'message.removed' ||
       value.type === 'status.changed'
     ) {
       return value

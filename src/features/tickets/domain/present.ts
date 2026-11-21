@@ -53,10 +53,18 @@ export function presentEvent(
       if (!visible) return null
       return { ...event, payload: visible }
     }
-    case 'message.added': {
+    case 'message.added':
+    case 'message.edited': {
       /** Valor ticket. */
       const ticket = state.tickets.find((item) => item.id === event.payload.ticketId)
       if (!ticket || !presentMessage(event.payload, ticket, viewer)) return null
+      return event
+    }
+    case 'message.removed': {
+      /** Valor ticket. */
+      const ticket = state.tickets.find((item) => item.id === event.payload.ticketId)
+      if (!ticket || !canAccess(viewer, ticket)) return null
+      if (viewer.role === 'customer' && event.payload.visibility === 'internal') return null
       return event
     }
     case 'ticket.assigned':

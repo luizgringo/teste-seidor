@@ -13,6 +13,11 @@ export const messageSchema = z.object({
   visibility: z.enum(MESSAGE_VISIBILITIES),
 })
 
+/** Corpo do pedido que altera o texto da própria mensagem. */
+export const messageEditSchema = z.object({
+  body: z.string().trim().min(1).max(8000),
+})
+
 /** Corpo do pedido que muda o status. */
 export const statusSchema = z.object({
   to: z.enum(TICKET_STATUSES),

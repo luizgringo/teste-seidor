@@ -39,6 +39,20 @@ export function reduceWorkspace(workspace: Workspace, event: ClientEvent): Works
             : ticket,
         ),
       }
+    case 'message.edited':
+      return {
+        ...workspace,
+        seenEventIds,
+        messages: workspace.messages.map((message) =>
+          message.id === event.payload.id ? event.payload : message,
+        ),
+      }
+    case 'message.removed':
+      return {
+        ...workspace,
+        seenEventIds,
+        messages: workspace.messages.filter((message) => message.id !== event.payload.messageId),
+      }
     case 'status.changed': {
       /** Valor change. */
       const change: StatusChange = {

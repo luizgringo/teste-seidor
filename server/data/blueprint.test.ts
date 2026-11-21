@@ -34,7 +34,7 @@ describe('buildState', () => {
     expect(
       state.messages.some(
         (message) =>
-          message.visibility === 'internal' && message.body.includes('maintenance window'),
+          message.visibility === 'internal' && message.body.includes('janela de manutenção'),
       ),
     ).toBe(true)
   })

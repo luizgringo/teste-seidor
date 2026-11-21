@@ -1,10 +1,13 @@
-import * as Dropdown from '@radix-ui/react-dropdown-menu'
+import { Button, DropdownMenu } from '@radix-ui/themes'
+import { AnimatePresence, motion } from 'motion/react'
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link, NavLink, useNavigate } from 'react-router'
+import { Link, NavLink, useLocation, useNavigate } from 'react-router'
 import { useSession } from '@/features/auth/useSession.ts'
 import { api } from '@/shared/api/http.ts'
 import { LanguageSelect } from '@/shared/i18n/LanguageSelect.tsx'
+import { ActionLabel } from '@/shared/icons/ActionIcon.tsx'
+import { PersonName } from '@/shared/people/PersonName.tsx'
 import styles from './shell.module.css'
 
 /**
@@ -19,6 +22,8 @@ export function Shell({ children }: { children: ReactNode }) {
   const session = useSession()
   /** Valor navigate. */
   const navigate = useNavigate()
+  /** Valor location. */
+  const location = useLocation()
   /** Valor persona. */
   const persona = session.data?.persona
   /** Valor home. */
@@ -46,25 +51,63 @@ export function Shell({ children }: { children: ReactNode }) {
           ) : (
             <NavLink to="/queue">{t('nav.queue')}</NavLink>
           )}
+          <NavLink to="/board">
+            <ActionLabel name="board">{t('nav.board')}</ActionLabel>
+          </NavLink>
           {persona?.role === 'manager' ? <NavLink to="/team">{t('nav.team')}</NavLink> : null}
-          <NavLink to="/tickets/new">{t('nav.newTicket')}</NavLink>
+          <NavLink to="/tickets/new">
+            <ActionLabel name="plus">{t('nav.newTicket')}</ActionLabel>
+          </NavLink>
         </nav>
-        <LanguageSelect className={styles.language} />
-        {persona ? (
-          <Dropdown.Root>
-            <Dropdown.Trigger className={styles.account}>{persona.name}</Dropdown.Trigger>
-            <Dropdown.Portal>
-              <Dropdown.Content className={styles.menu} align="end">
-                <Dropdown.Item asChild>
-                  <Link to="/session">{t('nav.switchPersona')}</Link>
-                </Dropdown.Item>
-                <Dropdown.Item onSelect={() => void logout()}>{t('nav.signOut')}</Dropdown.Item>
-              </Dropdown.Content>
-            </Dropdown.Portal>
-          </Dropdown.Root>
-        ) : null}
+        <div className={styles.tools}>
+          <LanguageSelect className={styles.language} />
+          {persona ? (
+            <DropdownMenu.Root>
+              <DropdownMenu.Trigger>
+                <Button className={styles.account} type="button" variant="outline">
+                  <PersonName userId={persona.id} name={persona.name} />
+                </Button>
+              </DropdownMenu.Trigger>
+              <DropdownMenu.Content align="end" collisionPadding={16} sideOffset={8}>
+                <DropdownMenu.Item asChild>
+                  <Link to="/session">
+                    <ActionLabel name="swap">{t('nav.switchPersona')}</ActionLabel>
+                  </Link>
+                </DropdownMenu.Item>
+                <DropdownMenu.Item onSelect={() => void logout()}>
+                  <ActionLabel name="signOut">{t('nav.signOut')}</ActionLabel>
+                </DropdownMenu.Item>
+              </DropdownMenu.Content>
+            </DropdownMenu.Root>
+          ) : null}
+        </div>
       </header>
-      <main className={styles.main}>{children}</main>
+      <main className={styles.main}>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={stageKey(location.pathname, persona?.role)}
+            className={styles.stage}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+          >
+            {children}
+          </motion.div>
+        </AnimatePresence>
+      </main>
     </div>
   )
+}
+
+/**
+ * Agrupa a fila e o chamado aberto para a troca de página não repetir a mesa.
+ * @param pathname - Caminho atual.
+ * @param role - Papel da persona, quando já escolhido.
+ * @returns Chave estável da tela.
+ */
+function stageKey(pathname: string, role: string | undefined): string {
+  if (role !== 'customer' && (pathname === '/queue' || pathname.startsWith('/tickets/'))) {
+    if (pathname !== '/tickets/new') return '/desk'
+  }
+  return pathname
 }

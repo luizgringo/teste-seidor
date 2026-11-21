@@ -1,0 +1,15 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.form :global(textarea) {
+  min-height: 96px;
+}
+
+.form :global(.rt-SegmentedControlRoot),
+.form :global(.rt-BaseButton) {
+  align-self: flex-start;
+}

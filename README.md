@@ -1,6 +1,6 @@
 # Northline Support
 
-Área de tickets de um ITSM novo. Três pessoas usam o mesmo sistema com rotinas diferentes: Marina na fila, Ricardo na equipe e Helena nos próprios pedidos. A interface, as rotas e o contrato estão em inglês.
+Área de tickets de um ITSM novo. Três pessoas usam o mesmo sistema com rotinas diferentes: Marina na fila, Ricardo na equipe e Helena nos próprios pedidos. As rotas, os eventos e os papéis ficam em inglês. A interface abre em português.
 
 [![Node](https://img.shields.io/badge/node-24_LTS-339933)](https://nodejs.org/)
 [![pnpm](https://img.shields.io/badge/pnpm-9-f69220)](https://pnpm.io/)
@@ -11,6 +11,8 @@
 [![TanStack Query](https://img.shields.io/badge/tanstack_query-5.108.2-ff4154)](https://tanstack.com/query)
 [![Zod](https://img.shields.io/badge/zod-4.6.7-3e67b1)](https://zod.dev/)
 [![Hono](https://img.shields.io/badge/hono-4.13.19-e36002)](https://hono.dev/)
+[![Radix Themes](https://img.shields.io/badge/radix_themes-3.3.0-161a1d)](https://www.radix-ui.com/themes)
+[![Motion](https://img.shields.io/badge/motion-14.14.0-ff4f8b)](https://motion.dev/)
 [![Biome](https://img.shields.io/badge/biome-2.6.8-60a5fa)](https://biomejs.dev/)
 [![Playwright](https://img.shields.io/badge/playwright-1.65.1-2ead33)](https://playwright.dev/)
 [![lines](https://img.shields.io/badge/coverage_lines-94.77%25-brightgreen)](docs/development/testing.md)
@@ -21,16 +23,21 @@
 ## O que esta fatia faz
 
 - Abrir um ticket.
-- Encontrar um ticket e ver a conversa, o status, quem atende e o prazo.
+- Encontrar um ticket pela fila ou pelo quadro e abrir `/tickets/TCK-10422`, com o código público na URL.
+- Ver a descrição, a linha do tempo da atividade e os detalhes do chamado.
+- Destacar em vermelho o que já estourou o prazo.
 - Pegar um ticket para atender.
-- Trocar mensagens públicas e notas internas.
+- Trocar mensagens públicas e notas internas, e editar ou apagar a própria mensagem.
 - Mudar o status com um motivo, inclusive reabrir um ticket fechado.
 - Acompanhar a carga e o tempo ocioso de um grupo de consultores.
+- Mostrar uma foto ao lado de cada nome e o andamento para quem abriu o pedido.
 - Refletir, na tela aberta, o que outra pessoa fez.
+
+A mesa usa Radix Themes, com a paleta da Northline, e Motion nas trocas de tela, na fila e na conversa. A decisão visual está em [docs/architecture/decisions/0007-radix-themes.md](docs/architecture/decisions/0007-radix-themes.md). O quadro, em `/board`, está disponível para Marina, Ricardo e Helena. Helena não vê prioridade nem cor de SLA.
 
 ## Dados de exemplo
 
-O arquivo `dados.json` deste teste estava num link do WeTransfer que já tinha expirado na hora do download. A base em `server/data/blueprint.ts` foi reconstruída a partir do contexto do enunciado: volume de um tenant, três perfis, notas internas, prazos perto de estourar e histórico de atribuição. Os instantes são relativos ao boot do servidor, então a fila de Marina continua com ticket a minutos do prazo quando o projeto é aberto outro dia. O detalhe está em [docs/data/mock-dataset.md](docs/data/mock-dataset.md).
+O arquivo `dados.json` deste teste estava num link do WeTransfer que já tinha expirado na hora do download. A base em `server/data/blueprint.ts` foi reconstruída a partir do contexto do enunciado: volume de um tenant, três perfis, notas internas, prazos perto de estourar e histórico de atribuição. Títulos, descrições, mensagens e motivos de exemplo estão em português. Os instantes são relativos ao boot do servidor, então a fila de Marina continua com ticket a minutos do prazo quando o projeto é aberto outro dia. O detalhe está em [docs/data/mock-dataset.md](docs/data/mock-dataset.md).
 
 O contrato original em português foi traduzido. O mapa está em [docs/api/events.md](docs/api/events.md).
 
@@ -53,15 +60,15 @@ pnpm dev
 
 O Vite encaminha `/api`, `/auth` e `/ws` para a API. O navegador fala só com a porta 5173, e o cookie de sessão fica no mesmo endereço.
 
-Abra http://localhost:5173/login. A interface abre em português do Brasil. O seletor **Idioma**, no topo, troca para inglês ou espanhol. Neste ambiente local o GitHub ainda não está configurado. Use **Ver a mesa** e escolha a persona:
+Abra http://localhost:5173/login. A interface abre em português do Brasil. O seletor **Idioma** troca para inglês ou espanhol. A mesa só abre depois de **Continuar com o GitHub**. Em seguida, escolha a persona:
 
-| Persona         | O que a tela mostra                                                 |
-| --------------- | ------------------------------------------------------------------- |
-| Marina Costa    | Fila ordenada pelo prazo, com o que está prestes a estourar no topo |
-| Ricardo Alves   | Carga da equipe, risco de SLA e tempo sem ticket                    |
-| Helena Carvalho | Só os pedidos dela, em linguagem simples                            |
+| Persona         | O que a tela mostra                                                       |
+| --------------- | ------------------------------------------------------------------------- |
+| Marina Costa    | Fila pelo prazo, quadro por status e o chamado aberto ao lado             |
+| Ricardo Alves   | Carga da equipe, risco de SLA, tempo sem ticket e o mesmo quadro          |
+| Helena Carvalho | Só os pedidos dela, com foto, status e o que a mesa fez na linha do tempo |
 
-Depois do login dá para trocar a persona no menu do nome, em **Switch persona**.
+Depois do login dá para trocar a persona no menu do nome, em **Trocar persona**.
 
 ## GitHub OAuth
 
@@ -70,7 +77,7 @@ Crie um OAuth App em GitHub → Settings → Developer settings → OAuth Apps.
 - Homepage URL: `http://localhost:5173`
 - Callback URL: `http://localhost:5173/auth/github/callback`
 
-Copie `.env.example` para `.env` e preencha:
+O app Northline Support já aceita esse retorno junto com o de produção. As chaves locais ficam em `.env.local`, que o git ignora. Copie `.env.example` para `.env` e preencha:
 
 ```bash
 GITHUB_CLIENT_ID=
@@ -79,9 +86,9 @@ SESSION_SECRET=
 APP_URL=http://localhost:5173
 ```
 
-`.env` não entra no git. Com as duas chaves do GitHub preenchidas, o botão **Continue with GitHub** aparece. A conta GitHub autentica a pessoa. Marina, Ricardo e Helena continuam sendo uma escolha de persona, gravada na sessão do servidor.
+`.env` não entra no git. Com as duas chaves do GitHub preenchidas, o botão **Continuar com o GitHub** aparece. A conta GitHub autentica a pessoa. Marina, Ricardo e Helena continuam sendo uma escolha de persona, gravada na sessão do servidor.
 
-Em produção a variável `E2E_SESSION` não existe. O botão de preview local some.
+Em produção a variável `E2E_SESSION` não existe. Sem ela, não há atalho para a mesa.
 
 ## Variáveis
 
@@ -123,7 +130,7 @@ A jornada no navegador está em `tests/e2e/desk.spec.ts`. O critério do que ent
 
 A demonstração está em https://teste-seidor-navy.vercel.app. A proteção de acesso da Vercel está desligada. O login usa o OAuth App Northline Support: a pessoa entra com o GitHub e escolhe Marina, Ricardo ou Helena. O preview local não existe nesse endereço. O estado dos chamados fica no Redis da integração Upstash.
 
-A callback de produção é `https://teste-seidor-navy.vercel.app/auth/github/callback`.
+A callback de produção é `https://teste-seidor-navy.vercel.app/auth/github/callback`. O mesmo app também aceita `http://localhost:5173/auth/github/callback`.
 
 ## Onde ler o resto
 

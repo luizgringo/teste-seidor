@@ -1,0 +1,52 @@
+.timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  column-gap: 14px;
+  padding-bottom: 14px;
+}
+
+.item::before {
+  content: "";
+  position: absolute;
+  left: 9px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #9eb4bb;
+}
+
+.item:first-child::before {
+  top: 16px;
+}
+
+.item:last-child::before {
+  height: 22px;
+  bottom: auto;
+}
+
+.node {
+  width: 12px;
+  height: 12px;
+  margin: 16px auto 0;
+  border-radius: 999px;
+  background: var(--paper);
+  box-shadow: 0 0 0 2px var(--tide);
+  position: relative;
+  z-index: 1;
+}
+
+.update .node {
+  margin-top: 6px;
+  box-shadow: 0 0 0 2px var(--quiet);
+}
+
+.note .node {
+  box-shadow: 0 0 0 2px var(--amber);
+}

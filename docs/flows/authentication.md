@@ -20,6 +20,6 @@ sequenceDiagram
   Hono->>Browser: cookie com personaId
 ```
 
-No computador de desenvolvimento, sem `GITHUB_CLIENT_ID`, a tela oferece **Preview the desk**. Esse caminho só existe com `E2E_SESSION=1`, que o `.env.development` liga e a produção não liga. O Playwright usa `POST /auth/test-session` pelo mesmo motivo: a suíte não depende do GitHub real.
+No computador de desenvolvimento as chaves ficam em `.env.local`. A tela só oferece o GitHub. `POST /auth/test-session` existe com `E2E_SESSION=1`, que o `.env.development` liga e a produção não liga, para a suíte do Playwright não depender do GitHub real.
 
 O cookie é HMAC SHA-256 com `SESSION_SECRET`. Não há token no `localStorage`.

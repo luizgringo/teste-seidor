@@ -6,7 +6,7 @@ function ticket(description: string): Ticket {
   return {
     id: 'ticket-closed',
     number: 'TCK-10001',
-    title: 'VPN from Lisbon fails',
+    title: 'A VPN de Lisboa falha',
     description,
     status: 'closed',
     priority: 'medium',
@@ -21,13 +21,16 @@ function ticket(description: string): Ticket {
 
 describe('suggestReopen', () => {
   it('points at a closed ticket that shares the meaningful words', () => {
-    const closed = ticket('VPN from Lisbon fails when the office network changes')
-    const match = suggestReopen('VPN from Lisbon fails again after the laptop update', [closed])
+    const closed = ticket('A VPN de Lisboa falha quando a rede do escritório muda')
+    const match = suggestReopen(
+      'A VPN de Lisboa falha quando a rede do escritório muda outra vez',
+      [closed],
+    )
     expect(match?.id).toBe(closed.id)
   })
 
   it('stays quiet when the draft is a different problem', () => {
-    const closed = ticket('The badge printer on floor 3 jams every morning')
-    expect(suggestReopen('Payroll export fails before the cutoff', [closed])).toBeNull()
+    const closed = ticket('A impressora de crachás do terceiro andar trava toda manhã')
+    expect(suggestReopen('A exportação da folha falha antes do fechamento', [closed])).toBeNull()
   })
 })

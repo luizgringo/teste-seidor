@@ -1,10 +1,13 @@
+import { Button, TextField } from '@radix-ui/themes'
 import { useTranslation } from 'react-i18next'
-import { useParams, useSearchParams } from 'react-router'
+import { Navigate, useParams, useSearchParams } from 'react-router'
 import styles from '@/features/tickets/components/desk.module.css'
 import { TicketList } from '@/features/tickets/components/TicketList.tsx'
 import { TicketPanel } from '@/features/tickets/components/TicketPanel.tsx'
 import { queueSections } from '@/features/tickets/domain/queue.ts'
+import { ticketByRoute } from '@/features/tickets/domain/ticketRef.ts'
 import { useTicketStream, useWorkspace } from '@/features/tickets/hooks/useWorkspace.ts'
+import { ActionLabel } from '@/shared/icons/ActionIcon.tsx'
 
 /** Fila da consultora e do gestor, com o chamado aberto ao lado. */
 export function QueuePage() {
@@ -38,15 +41,19 @@ export function QueuePage() {
   /** Valor sections. */
   const sections = queueSections(filtered, data.viewer, now, showDone)
   /** Valor selected. */
-  const selected = data.tickets.find((ticket) => ticket.id === ticketId)
+  const selected = ticketByRoute(data.tickets, ticketId)
+  if (selected && ticketId !== selected.number) {
+    return <Navigate to={`/tickets/${selected.number}`} replace />
+  }
   return (
-    <div className={styles.page}>
+    <div className={selected ? `${styles.page} ${styles.pageOpen}` : styles.page}>
       <div className={styles.list}>
         <search className={styles.filters}>
-          <input
+          <TextField.Root
             aria-label={t('queue.find')}
-            value={query}
+            className={styles.find}
             placeholder={t('queue.find')}
+            value={query}
             onChange={(event) => {
               /** Valor next. */
               const next = new URLSearchParams(params)
@@ -56,9 +63,10 @@ export function QueuePage() {
             }}
           />
           {data.viewer.role === 'manager' ? (
-            <button
-              className={styles.quiet}
+            <Button
+              color="gray"
               type="button"
+              variant="soft"
               onClick={() => {
                 /** Valor next. */
                 const next = new URLSearchParams(params)
@@ -67,14 +75,16 @@ export function QueuePage() {
                 setParams(next)
               }}
             >
-              {showDone ? t('queue.hideClosed') : t('queue.showClosed')}
-            </button>
+              <ActionLabel name={showDone ? 'eyeOff' : 'eye'}>
+                {showDone ? t('queue.hideClosed') : t('queue.showClosed')}
+              </ActionLabel>
+            </Button>
           ) : null}
         </search>
         <TicketList
           sections={sections}
           users={data.users}
-          selectedId={ticketId}
+          selectedId={selected?.id}
           nowMs={now}
           showClock={data.viewer.role !== 'customer'}
         />
@@ -82,7 +92,10 @@ export function QueuePage() {
       {selected ? (
         <TicketPanel ticket={selected} workspace={data} nowMs={now} />
       ) : (
-        <p className={styles.empty}>{t('queue.emptySelection')}</p>
+        <div className={styles.empty}>
+          <h2>{t('queue.emptyTitle')}</h2>
+          <p>{t('queue.emptySelection')}</p>
+        </div>
       )}
     </div>
   )

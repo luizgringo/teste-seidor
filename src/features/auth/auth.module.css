@@ -13,13 +13,87 @@
   box-shadow: var(--shadow);
 }
 
-.language {
-  color: var(--ink);
-  background: white;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  padding: 8px 12px;
+.cardHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   margin-bottom: 12px;
+}
+
+.cardHead p {
+  margin: 0;
+}
+
+.login {
+  width: min(400px, 100%);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 28px 32px 32px;
+  box-shadow: var(--shadow);
+}
+
+.loginTools {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.brand {
+  margin: 12px 0 0;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--quiet);
+}
+
+.title {
+  margin: 20px 0 8px;
+  font-family: Fraunces, serif;
+  font-size: 32px;
+  font-weight: 560;
+  letter-spacing: -0.03em;
+}
+
+.intro,
+.missing {
+  margin: 0;
+  color: var(--quiet);
+}
+
+.github {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  margin-top: 24px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--tide-deep);
+  color: var(--cream);
+  text-decoration: none;
+  font-weight: 600;
+  transition:
+    background-color 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.github:active {
+  transform: scale(0.98);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .github,
+  .github:active {
+    transition: none;
+    transform: none;
+  }
+}
+
+.github:hover {
+  background: var(--tide);
 }
 
 .wordmark {
@@ -29,14 +103,23 @@
   letter-spacing: -0.04em;
 }
 
+.login .wordmark {
+  margin-top: 4px;
+  font-size: 40px;
+}
+
+.error {
+  margin: 16px 0 0;
+  color: var(--breach);
+}
+
 .choices {
   display: grid;
   gap: 10px;
   margin-top: 16px;
 }
 
-.choices button,
-.primary {
+.choices button {
   text-align: left;
   border-radius: 14px;
   border: 1px solid var(--line);
@@ -48,9 +131,8 @@
     background-color 160ms ease;
 }
 
-.choices button:hover,
-.primary:hover {
-  border-color: var(--tide);
+.choices button:hover {
+  border-color: var(--accent-9, var(--tide));
 }
 
 .choices button strong {
@@ -59,11 +141,4 @@
 
 .choices button span {
   color: var(--quiet);
-}
-
-.primary {
-  background: var(--tide);
-  color: white;
-  border: 0;
-  margin-top: 16px;
 }

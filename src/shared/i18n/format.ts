@@ -27,6 +27,25 @@ export function formatDue(dueAt: string, nowMs: number, translate: TFunction): s
 }
 
 /**
+ * Data e hora no idioma ativo.
+ * @param iso - Instante ISO.
+ * @param locale - Código do idioma, como `pt-BR`.
+ * @returns Texto curto com dia, mês, ano e horário.
+ */
+export function formatWhen(iso: string, locale: string): string {
+  /** Valor date. */
+  const date = new Date(iso)
+  if (Number.isNaN(date.getTime())) return iso
+  return new Intl.DateTimeFormat(locale, {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(date)
+}
+
+/**
  * Traduz uma chave de erro da API. Se o texto não for chave, devolve o original.
  * @param message - Chave `errors.*` ou texto já pronto.
  * @param translate - Função de tradução do i18next.

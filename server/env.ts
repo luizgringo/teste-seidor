@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs'
 /** Lê os arquivos locais de ambiente sem substituir variável que o processo já definiu. */
 export function loadLocalEnv(): void {
   if (process.env.VERCEL) return
-  for (const file of ['.env', '.env.development']) {
+  for (const file of ['.env', '.env.development', '.env.local']) {
     try {
       applyEnv(readFileSync(file, 'utf8'))
     } catch {

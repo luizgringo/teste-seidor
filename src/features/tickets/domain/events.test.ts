@@ -57,5 +57,24 @@ describe('reduceWorkspace', () => {
     }
     const once = reduceWorkspace(workspace, event)
     expect(reduceWorkspace(once, event).messages).toHaveLength(1)
+    const edited = reduceWorkspace(once, {
+      id: 'event-edit',
+      type: 'message.edited',
+      occurredAt: '2026-11-20T12:06:00.000Z',
+      payload: { ...event.payload, body: 'Updated.' },
+    })
+    expect(edited.messages[0]?.body).toBe('Updated.')
+    expect(
+      reduceWorkspace(edited, {
+        id: 'event-remove',
+        type: 'message.removed',
+        occurredAt: '2026-11-20T12:07:00.000Z',
+        payload: {
+          messageId: 'message-public',
+          ticketId: payrollTicket.id,
+          visibility: 'public',
+        },
+      }).messages,
+    ).toEqual([])
   })
 })

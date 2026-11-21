@@ -13,6 +13,8 @@ Todas as rotas exigem o cookie, menos saúde, configuração e o início do logi
 - `GET /api/team` só para `manager`
 - `POST /api/tickets`
 - `POST /api/tickets/:ticketId/messages`
+- `PATCH /api/tickets/:ticketId/messages/:messageId` só o autor
+- `DELETE /api/tickets/:ticketId/messages/:messageId` só o autor
 - `POST /api/tickets/:ticketId/status`
 - `POST /api/tickets/:ticketId/take`
 - `POST /api/tickets/:ticketId/assign`
