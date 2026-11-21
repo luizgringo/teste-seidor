@@ -12,7 +12,6 @@ dist-ssr
 coverage
 playwright-report
 test-results
-api/index.mjs
 *.local
 .env
 .env.local
